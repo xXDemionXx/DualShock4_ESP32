@@ -1,3 +1,3 @@
 idf_component_register(SRCS "dualshock4.c"
-                       INCLUDE_DIRS "."
+                       INCLUDE_DIRS "." "includes"
                        REQUIRES bluepad32)
