@@ -30,6 +30,7 @@
 typedef enum
 {
     DS4_INIT_SUCCESFUL,
+    DS4_INIT_BTSTACK_INIT_FAILED,
     DS4_INIT_FAILED
 }ds4_init_e;
 

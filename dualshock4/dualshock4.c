@@ -1,5 +1,7 @@
 #include "dualshock4.h"
 
+#include "dualshock4_initializer.h"
+
 /**
  * @brief Sets up everything needed for ds4 before we can connect.
  *
@@ -18,7 +20,10 @@ ds4_init_e ds4_init(void)
 
     // Configure BTstack for ESP32 VHCI Controller
     if (btstack_init() != 0)
-        return DS4_INIT_FAILED; // Check the error code
-    else
-        return DS4_INIT_SUCCESFUL;
+        return DS4_INIT_BTSTACK_INIT_FAILED;
+
+    // Get pointer to a struct containing all functions for the platform
+    ds4_platform_handle ds4_platform = get_ds4_platform();
+
+    return DS4_INIT_SUCCESFUL;
 }

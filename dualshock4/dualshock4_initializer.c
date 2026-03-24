@@ -61,8 +61,9 @@ static void ds4_platform_init_on_init_complete(void)
 //
 // Entry Point
 //
-struct uni_platform *get_my_platform(void)
+struct uni_platform *get_ds4_platform(void)
 {
+    // Create a static function pointer table
     static struct uni_platform plat = {
         .name = DUALSHOCK4_NAME,
         .init = ds4_platform_init,

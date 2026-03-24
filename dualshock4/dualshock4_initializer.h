@@ -19,4 +19,8 @@
 #error "Must use BLUEPAD32_PLATFORM_CUSTOM"
 #endif
 
+// Types
+
+typedef struct uni_platform* ds4_platform_handle;
+
 #endif // DUALSHOCK4_INITIALIZER_H
