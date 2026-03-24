@@ -1,23 +1,24 @@
 #include "dualshock4.h"
 
+/**
+ * @brief Sets up everything needed for ds4 before we can connect.
+ *
+ * @return With what state did the initialization exit.
+ */
+ds4_init_e ds4_init(void)
+{
+    // If you enable HCI Dump better to disable "Bluepad32 USB Console" from "idf.py menuconfig".
 
+    // Don't use BTstack buffered UART. It conflicts with the console.
+#ifdef CONFIG_ESP_CONSOLE_UART
+#ifndef CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
+    btstack_stdio_init();
+#endif // CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
+#endif // CONFIG_ESP_CONSOLE_UART
 
-//
-// Entry Point
-//
-struct uni_platform* get_my_platform(void) {
-    static struct uni_platform plat = {
-        .name = DUALSHOCK4_NAME,
-        .init = my_platform_init,
-        .on_init_complete = my_platform_on_init_complete,
-        .on_device_discovered = my_platform_on_device_discovered,
-        .on_device_connected = my_platform_on_device_connected,
-        .on_device_disconnected = my_platform_on_device_disconnected,
-        .on_device_ready = my_platform_on_device_ready,
-        .on_oob_event = my_platform_on_oob_event,
-        .on_controller_data = my_platform_on_controller_data,
-        .get_property = my_platform_get_property,
-    };
-
-    return &plat;
+    // Configure BTstack for ESP32 VHCI Controller
+    if (btstack_init() != 0)
+        return DS4_INIT_FAILED; // Check the error code
+    else
+        return DS4_INIT_SUCCESFUL;
 }

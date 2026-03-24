@@ -24,6 +24,15 @@
 
 // Types
 
+/**
+ * @brief Describes how the initialization process went.
+ */
+typedef enum
+{
+    DS4_INIT_SUCCESFUL,
+    DS4_INIT_FAILED
+}ds4_init_e;
+
 // Callable functions
 
 ds4_init_e ds4_init(void);
