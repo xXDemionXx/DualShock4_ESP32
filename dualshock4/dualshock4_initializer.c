@@ -6,8 +6,8 @@
  * Currently we aren't doing anything special in
  * initialization.
  *
- * @param argc Number of arguments (UNUSED)
- * @param argv Vector of arguments (UNUSED)
+ * @param[in] argc Number of arguments (UNUSED)
+ * @param[in] argv Vector of arguments (UNUSED)
  */
 static void ds4_platform_init(int argc, const char **argv)
 {
@@ -58,6 +58,182 @@ static void ds4_platform_init_on_init_complete(void)
         uni_bt_list_keys_unsafe();
 }
 
+
+/**
+ * @brief Filter out the devices we don't want.
+ * 
+ * Filter everything that isn't a DS4 controller.
+ * 
+ * @param[in] addr the Bluetooth address
+ * @param[in] name could be NULL, could be zero-length, or might contain the name
+ * @param[in] cod Class of Device. See "uni_bt_defines.h" for possible values
+ * @param[in] rssi Received Signal Strength Indicator (RSSI) measured in dBms. The higher (255) the better.
+ * @return UNI error code, see uni_error.h
+ */ 
+static uni_error_t ds4_platform_on_device_discovered(bd_addr_t addr, const char* name, uint16_t cod, uint8_t rssi) {
+    // DualShock 4 is a gamepad so filter out anything that isn't a game pad.
+    if (((cod & UNI_BT_COD_MINOR_MASK) & UNI_BT_COD_MINOR_GAMEPAD) != UNI_BT_COD_MINOR_GAMEPAD) {
+        logi("Ignoring device - Not a DualShock 4 gamepad\n");
+        return UNI_ERROR_IGNORE_DEVICE;
+    }
+
+    return UNI_ERROR_SUCCESS;
+}
+
+/**
+ * @brief What to do when a device connects
+ * 
+ * Currently nothing except logging.
+ * 
+ * @param[in] d connected device handle
+ */ 
+static void ds4_platform_on_device_connected(uni_hid_device_t* d) {
+    logi(DUALSHOCK4_NAME ": device connected: %p\n", d);
+}
+
+/**
+ * @brief What to do when a device disconnects
+ * 
+ * Currently nothing except logging.
+ * 
+ * @param[in] d disconnected device handle
+ */ 
+static void ds4_platform_on_device_disconnected(uni_hid_device_t* d) {
+    logi(DUALSHOCK4_NAME ": device disconnected: %p\n", d);
+}
+
+/**
+ * @brief What to do when a device is ready for communication
+ * 
+ * Currently nothing except logging and setting seat of instance.
+ * 
+ * @param[in] d ready device handle
+ * @return UNI error code, see uni_error.h
+ */ 
+static uni_error_t ds4_platform_on_device_ready(uni_hid_device_t* d) {
+    logi(DUALSHOCK4_NAME ": device ready: %p\n", d);
+    platform_instance_t* ins = get_my_platform_instance(d);
+    ins->gamepad_seat = GAMEPAD_SEAT_A;
+
+    return UNI_ERROR_SUCCESS;
+}
+
+/**
+ * @brief What to do on OOB events
+ * 
+ * On DS4 OOB events are the pressing of system button
+ * and bluetooth scanning.
+ * 
+ * @param[in] event event that triggered
+ * @param[in] data data of the event
+ */ 
+static void ds4_platform_on_oob_event(uni_platform_oob_event_t event, void* data) {
+
+    // Need to test all events on DS4, for now just log them
+    logi(DUALSHOCK4_NAME ": on_device_oob_event(): %d\n", event);
+
+    // switch (event) {
+    //     case UNI_PLATFORM_OOB_GAMEPAD_SYSTEM_BUTTON: {
+    //         uni_hid_device_t* d = data;
+
+    //         if (d == NULL) {
+    //             loge("ERROR: ds4_platform_on_oob_event: Invalid NULL device\n");
+    //             return;
+    //         }
+    //         logi("custom: on_device_oob_event(): %d\n", event);
+
+    //         platform_instance_t* ins = get_my_platform_instance(d);
+    //         ins->gamepad_seat = ins->gamepad_seat == GAMEPAD_SEAT_A ? GAMEPAD_SEAT_B : GAMEPAD_SEAT_A;
+
+    //         trigger_event_on_gamepad(d);
+    //         break;
+    //     }
+
+    //     case UNI_PLATFORM_OOB_BLUETOOTH_ENABLED:
+    //         logi("custom: Bluetooth enabled: %d\n", (bool)(data));
+    //         break;
+
+    //     default:
+    //         logi("my_platform_on_oob_event: unsupported event: 0x%04x\n", event);
+    //         break;
+    // }
+}
+
+/**
+ * @brief What to do when controller data arrives
+ * 
+ * Currently just logging
+ * 
+ * @param[in] d device that sent the data
+ * @param[in] ctl controllers data
+ */ 
+static void ds4_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t* ctl) {
+    static uint8_t leds = 0;
+    static uint8_t enabled = true;
+    static uni_controller_t prev = {0};
+    uni_gamepad_t* gp;
+
+    // Optimization to avoid processing the previous data so that the console
+    // does not get spammed with a lot of logs, but remove it from your project.
+    if (memcmp(&prev, ctl, sizeof(*ctl)) == 0) {
+        return;
+    }
+    prev = *ctl;
+    // Print device Id before dumping gamepad.
+    // This could be very CPU intensive and might crash the ESP32.
+    // Remove these 2 lines in production code.
+    //    logi("(%p), id=%d, \n", d, uni_hid_device_get_idx_for_instance(d));
+    //    uni_controller_dump(ctl);
+
+    // switch (ctl->klass) {
+    //     case UNI_CONTROLLER_CLASS_GAMEPAD:
+    //         gp = &ctl->gamepad;
+
+    //         // Debugging
+    //         // Axis ry: control rumble
+    //         if ((gp->buttons & BUTTON_A) && d->report_parser.play_dual_rumble != NULL) {
+    //             d->report_parser.play_dual_rumble(d, 0 /* delayed start ms */, 250 /* duration ms */,
+    //                                               255 /* weak magnitude */, 0 /* strong magnitude */);
+    //         }
+    //         // Buttons: Control LEDs On/Off
+    //         if ((gp->buttons & BUTTON_B) && d->report_parser.set_player_leds != NULL) {
+    //             d->report_parser.set_player_leds(d, leds++ & 0x0f);
+    //         }
+    //         // Axis: control RGB color
+    //         if ((gp->buttons & BUTTON_X) && d->report_parser.set_lightbar_color != NULL) {
+    //             uint8_t r = (gp->axis_x * 256) / 512;
+    //             uint8_t g = (gp->axis_y * 256) / 512;
+    //             uint8_t b = (gp->axis_rx * 256) / 512;
+    //             d->report_parser.set_lightbar_color(d, r, g, b);
+    //         }
+
+    //         // Toggle Bluetooth connections
+    //         if ((gp->buttons & BUTTON_SHOULDER_L) && enabled) {
+    //             logi("*** Stop scanning\n");
+    //             uni_bt_stop_scanning_safe();
+    //             enabled = false;
+    //         }
+    //         if ((gp->buttons & BUTTON_SHOULDER_R) && !enabled) {
+    //             logi("*** Start scanning\n");
+    //             uni_bt_start_scanning_and_autoconnect_safe();
+    //             enabled = true;
+    //         }
+    //         break;
+    //     default:
+    //         break;
+    // }
+}
+
+/**
+ * @brief Gets the property of controller
+ * 
+ * Needs further research
+ */ 
+static const uni_property_t* ds4_platform_get_property(uni_property_idx_t idx) {
+    ARG_UNUSED(idx);
+    return NULL;
+}
+
 //
 // Entry Point
 //
@@ -68,13 +244,13 @@ struct uni_platform *get_ds4_platform(void)
         .name = DUALSHOCK4_NAME,
         .init = ds4_platform_init,
         .on_init_complete = ds4_platform_init_on_init_complete,
-        .on_device_discovered = my_platform_on_device_discovered,
-        .on_device_connected = my_platform_on_device_connected,
-        .on_device_disconnected = my_platform_on_device_disconnected,
-        .on_device_ready = my_platform_on_device_ready,
-        .on_oob_event = my_platform_on_oob_event,
-        .on_controller_data = my_platform_on_controller_data,
-        .get_property = my_platform_get_property,
+        .on_device_discovered = ds4_platform_on_device_discovered,
+        .on_device_connected = ds4_platform_on_device_connected,
+        .on_device_disconnected = ds4_platform_on_device_disconnected,
+        .on_device_ready = ds4_platform_on_device_ready,
+        .on_oob_event = ds4_platform_on_oob_event,
+        .on_controller_data = ds4_platform_on_controller_data,
+        .get_property = ds4_platform_get_property,
     };
 
     return &plat;

@@ -20,7 +20,10 @@
 #endif
 
 // Types
-
-typedef struct uni_platform* ds4_platform_handle;
+typedef struct uni_platform *ds4_platform_handle;
+typedef struct platform_instance_s
+{
+    uni_gamepad_seat_t gamepad_seat; // which "seat" is being used
+} platform_instance_t;
 
 #endif // DUALSHOCK4_INITIALIZER_H
