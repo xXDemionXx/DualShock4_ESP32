@@ -27,14 +27,14 @@ ds4_init_e ds4_init(void)
     uni_platform_set_custom(get_ds4_platform());
 
     // Init Bluepad32 with no arguments
-    if(uni_init(0 /* argc */, NULL /* argv */) != 0)
-    return DS4_INIT_BLUEPAD_INIT_FAILED;
+    if (uni_init(0 /* argc */, NULL /* argv */) != 0)
+        return DS4_INIT_BLUEPAD_INIT_FAILED;
 
     return DS4_INIT_SUCCESFUL;
 }
 
-void ds4_run_loop(void){
+void ds4_run_loop(void)
+{
     // Does not return.
     btstack_run_loop_execute();
 }
-

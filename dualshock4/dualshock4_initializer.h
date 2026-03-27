@@ -26,4 +26,7 @@ typedef struct platform_instance_s
     uni_gamepad_seat_t gamepad_seat; // which "seat" is being used
 } platform_instance_t;
 
+// Function prototypes
+struct uni_platform *get_ds4_platform(void);
+
 #endif // DUALSHOCK4_INITIALIZER_H
