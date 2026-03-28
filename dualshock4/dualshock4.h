@@ -5,14 +5,6 @@
 
 #include "dualshock4_initializer.h"
 
-#ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
-#error "Must use Blupad32 \"custom\" platform in sdkconfig!"
-#endif
-
-#ifndef CONFIG_BT_ENABLED
-#error "Enable Bluetooth in sdkconfig!"
-#endif
-
 // Defines
 
 // Types

@@ -18,7 +18,12 @@
 #error "Must use BLUEPAD32_PLATFORM_CUSTOM"
 #endif
 
+#ifndef CONFIG_BT_ENABLED
+#error "Enable Bluetooth in sdkconfig!"
+#endif
+
 // Types
+typedef struct uni_platform ds4_platform;
 typedef struct uni_platform *ds4_platform_handle;
 typedef struct platform_instance_s
 {
@@ -26,6 +31,6 @@ typedef struct platform_instance_s
 } platform_instance_t;
 
 // Function prototypes
-struct uni_platform *get_ds4_platform(void);
+ds4_platform_handle get_ds4_platform(void);
 
 #endif // DUALSHOCK4_INITIALIZER_H

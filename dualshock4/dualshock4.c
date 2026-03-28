@@ -33,6 +33,12 @@ ds4_init_e ds4_init(void)
     return DS4_INIT_SUCCESFUL;
 }
 
+void ds4Set_controllerComandsQueue()
+{
+    // ds4_platform_handle ds4 = get_ds4_platform();
+    // ds4->
+}
+
 void ds4_run_loop(void)
 {
     // Does not return.

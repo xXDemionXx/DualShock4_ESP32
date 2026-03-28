@@ -2,7 +2,7 @@
 #include "dualshock4_default_funcs.h"
 
 // This is the global instance that holds all callbacks for DS4.
-static struct uni_platform ds4_platform = {
+static ds4_platform ds4 = {
     .name = DUALSHOCK4_DEFAULT_NAME,
     .init = default_ds4_platform_init,
     .on_init_complete = default_ds4_platform_init_on_init_complete,
@@ -18,7 +18,7 @@ static struct uni_platform ds4_platform = {
 /**
  * @brief Returns the pointer to the structure that contains all callbacks
  */
-struct uni_platform *get_ds4_platform(void)
+ds4_platform_handle get_ds4_platform(void)
 {
-    return &ds4_platform;
+    return &ds4;
 }
