@@ -193,8 +193,8 @@ static void ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller_
     // Print device Id before dumping gamepad.
     // This could be very CPU intensive and might crash the ESP32.
     // Remove these 2 lines in production code.
-    //    logi("(%p), id=%d, \n", d, uni_hid_device_get_idx_for_instance(d));
-    //    uni_controller_dump(ctl);
+    // logi("(%p), id=%d, \n", d, uni_hid_device_get_idx_for_instance(d));
+    // uni_controller_dump(ctl);
 
     // switch (ctl->klass) {
     //     case UNI_CONTROLLER_CLASS_GAMEPAD:
