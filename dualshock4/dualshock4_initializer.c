@@ -2,7 +2,7 @@
 
 // Function prototypes
 // static void trigger_event_on_gamepad(uni_hid_device_t* d); Unimplemented yet
-static platform_instance_t *get_ds4_platform_instance(uni_hid_device_t *d);
+static platform_instance_t *default_get_ds4_platform_instance(uni_hid_device_t *d);
 
 /**
  * @brief Do something for controller during init
@@ -13,7 +13,7 @@ static platform_instance_t *get_ds4_platform_instance(uni_hid_device_t *d);
  * @param[in] argc Number of arguments (UNUSED)
  * @param[in] argv Vector of arguments (UNUSED)
  */
-static void ds4_platform_init(int argc, const char **argv)
+static void default_ds4_platform_init(int argc, const char **argv)
 {
     ARG_UNUSED(argc);
     ARG_UNUSED(argv);
@@ -45,7 +45,7 @@ static void ds4_platform_init(int argc, const char **argv)
  *
  * Currently we aren't doing anything special.
  */
-static void ds4_platform_init_on_init_complete(void)
+static void default_ds4_platform_init_on_init_complete(void)
 {
     logi(DUALSHOCK4_NAME ": on_init_complete()\n");
 
@@ -73,7 +73,7 @@ static void ds4_platform_init_on_init_complete(void)
  * @param[in] rssi Received Signal Strength Indicator (RSSI) measured in dBms. The higher (255) the better.
  * @return UNI error code, see uni_error.h
  */
-static uni_error_t ds4_platform_on_device_discovered(bd_addr_t addr, const char *name, uint16_t cod, uint8_t rssi)
+static uni_error_t default_ds4_platform_on_device_discovered(bd_addr_t addr, const char *name, uint16_t cod, uint8_t rssi)
 {
     // DualShock 4 is a gamepad so filter out anything that isn't a game pad.
     if (((cod & UNI_BT_COD_MINOR_MASK) & UNI_BT_COD_MINOR_GAMEPAD) != UNI_BT_COD_MINOR_GAMEPAD)
@@ -92,7 +92,7 @@ static uni_error_t ds4_platform_on_device_discovered(bd_addr_t addr, const char 
  *
  * @param[in] d connected device handle
  */
-static void ds4_platform_on_device_connected(uni_hid_device_t *d)
+static void default_ds4_platform_on_device_connected(uni_hid_device_t *d)
 {
     logi(DUALSHOCK4_NAME ": device connected: %p\n", d);
 }
@@ -104,7 +104,7 @@ static void ds4_platform_on_device_connected(uni_hid_device_t *d)
  *
  * @param[in] d disconnected device handle
  */
-static void ds4_platform_on_device_disconnected(uni_hid_device_t *d)
+static void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
 {
     logi(DUALSHOCK4_NAME ": device disconnected: %p\n", d);
 }
@@ -117,11 +117,13 @@ static void ds4_platform_on_device_disconnected(uni_hid_device_t *d)
  * @param[in] d ready device handle
  * @return UNI error code, see uni_error.h
  */
-static uni_error_t ds4_platform_on_device_ready(uni_hid_device_t *d)
+static uni_error_t default_ds4_platform_on_device_ready(uni_hid_device_t *d)
 {
     logi(DUALSHOCK4_NAME ": device ready: %p\n", d);
     platform_instance_t *ins = get_ds4_platform_instance(d);
     ins->gamepad_seat = GAMEPAD_SEAT_A;
+
+    d->report_parser.set_lightbar_color(d, 200, 200, 0);
 
     return UNI_ERROR_SUCCESS;
 }
@@ -135,37 +137,25 @@ static uni_error_t ds4_platform_on_device_ready(uni_hid_device_t *d)
  * @param[in] event event that triggered
  * @param[in] data data of the event
  */
-static void ds4_platform_on_oob_event(uni_platform_oob_event_t event, void *data)
+static void default_ds4_platform_on_oob_event(uni_platform_oob_event_t event, void *data)
 {
 
     // Need to test all events on DS4, for now just log them
     logi(DUALSHOCK4_NAME ": on_device_oob_event(): %d\n", event);
 
-    // switch (event) {
-    //     case UNI_PLATFORM_OOB_GAMEPAD_SYSTEM_BUTTON: {
-    //         uni_hid_device_t* d = data;
+    switch (event)
+    {
+    case UNI_PLATFORM_OOB_GAMEPAD_SYSTEM_BUTTON:
+        break;
 
-    //         if (d == NULL) {
-    //             loge("ERROR: ds4_platform_on_oob_event: Invalid NULL device\n");
-    //             return;
-    //         }
-    //         logi("custom: on_device_oob_event(): %d\n", event);
+    case UNI_PLATFORM_OOB_BLUETOOTH_ENABLED:
+        logi("custom: Bluetooth enabled: %d\n", (bool)(data));
+        break;
 
-    //         platform_instance_t* ins = get_my_platform_instance(d);
-    //         ins->gamepad_seat = ins->gamepad_seat == GAMEPAD_SEAT_A ? GAMEPAD_SEAT_B : GAMEPAD_SEAT_A;
-
-    //         trigger_event_on_gamepad(d);
-    //         break;
-    //     }
-
-    //     case UNI_PLATFORM_OOB_BLUETOOTH_ENABLED:
-    //         logi("custom: Bluetooth enabled: %d\n", (bool)(data));
-    //         break;
-
-    //     default:
-    //         logi("my_platform_on_oob_event: unsupported event: 0x%04x\n", event);
-    //         break;
-    // }
+    default:
+        logi("DS4_platform_on_oob_event: unsupported event: 0x%04x\n", event);
+        break;
+    }
 }
 
 /**
@@ -176,7 +166,7 @@ static void ds4_platform_on_oob_event(uni_platform_oob_event_t event, void *data
  * @param[in] d device that sent the data
  * @param[in] ctl controllers data
  */
-static void ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller_t *ctl)
+static void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller_t *ctl)
 {
     // static uint8_t leds = 0;
     // static uint8_t enabled = true;
@@ -240,13 +230,13 @@ static void ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller_
  *
  * Needs further research
  */
-static const uni_property_t *ds4_platform_get_property(uni_property_idx_t idx)
+static const uni_property_t *default_ds4_platform_get_property(uni_property_idx_t idx)
 {
     ARG_UNUSED(idx);
     return NULL;
 }
 
-static platform_instance_t *get_ds4_platform_instance(uni_hid_device_t *d)
+static platform_instance_t *default_get_ds4_platform_instance(uni_hid_device_t *d)
 {
     return (platform_instance_t *)&d->platform_data[0];
 }
@@ -259,15 +249,15 @@ struct uni_platform *get_ds4_platform(void)
     // Create a static function pointer table
     static struct uni_platform plat = {
         .name = DUALSHOCK4_NAME,
-        .init = ds4_platform_init,
-        .on_init_complete = ds4_platform_init_on_init_complete,
-        .on_device_discovered = ds4_platform_on_device_discovered,
-        .on_device_connected = ds4_platform_on_device_connected,
-        .on_device_disconnected = ds4_platform_on_device_disconnected,
-        .on_device_ready = ds4_platform_on_device_ready,
-        .on_oob_event = ds4_platform_on_oob_event,
-        .on_controller_data = ds4_platform_on_controller_data,
-        .get_property = ds4_platform_get_property,
+        .init = default_ds4_platform_init,
+        .on_init_complete = default_ds4_platform_init_on_init_complete,
+        .on_device_discovered = default_ds4_platform_on_device_discovered,
+        .on_device_connected = default_ds4_platform_on_device_connected,
+        .on_device_disconnected = default_ds4_platform_on_device_disconnected,
+        .on_device_ready = default_ds4_platform_on_device_ready,
+        .on_oob_event = default_ds4_platform_on_oob_event,
+        .on_controller_data = default_ds4_platform_on_controller_data,
+        .get_property = default_ds4_platform_get_property,
     };
 
     return &plat;
