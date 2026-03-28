@@ -18,9 +18,6 @@
 #error "Must use BLUEPAD32_PLATFORM_CUSTOM"
 #endif
 
-// Defines
-#define DUALSHOCK4_NAME "dualshock4" // Name of the controller (prefixes it's messages to the console)
-
 // Types
 typedef struct uni_platform *ds4_platform_handle;
 typedef struct platform_instance_s

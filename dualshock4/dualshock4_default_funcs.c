@@ -1,4 +1,5 @@
 #include "dualshock4_initializer.h"
+#include "dualshock4_default_funcs.h"
 
 // Function prototypes
 // static void trigger_event_on_gamepad(uni_hid_device_t* d); Unimplemented yet
@@ -18,7 +19,7 @@ void default_ds4_platform_init(int argc, const char **argv)
     ARG_UNUSED(argc);
     ARG_UNUSED(argv);
 
-    logi(DUALSHOCK4_NAME ": init()\n");
+    logi(DUALSHOCK4_DEFAULT_NAME ": init()\n");
 
     // Invert the controls if needed
 #if 0
@@ -47,7 +48,7 @@ void default_ds4_platform_init(int argc, const char **argv)
  */
 void default_ds4_platform_init_on_init_complete(void)
 {
-    logi(DUALSHOCK4_NAME ": on_init_complete()\n");
+    logi(DUALSHOCK4_DEFAULT_NAME ": on_init_complete()\n");
 
     // Safe to call "unsafe" functions since they are called from BT thread
 
@@ -94,7 +95,7 @@ uni_error_t default_ds4_platform_on_device_discovered(bd_addr_t addr, const char
  */
 void default_ds4_platform_on_device_connected(uni_hid_device_t *d)
 {
-    logi(DUALSHOCK4_NAME ": device connected: %p\n", d);
+    logi(DUALSHOCK4_DEFAULT_NAME ": device connected: %p\n", d);
 }
 
 /**
@@ -106,7 +107,7 @@ void default_ds4_platform_on_device_connected(uni_hid_device_t *d)
  */
 void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
 {
-    logi(DUALSHOCK4_NAME ": device disconnected: %p\n", d);
+    logi(DUALSHOCK4_DEFAULT_NAME ": device disconnected: %p\n", d);
 }
 
 /**
@@ -119,7 +120,7 @@ void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
  */
 uni_error_t default_ds4_platform_on_device_ready(uni_hid_device_t *d)
 {
-    logi(DUALSHOCK4_NAME ": device ready: %p\n", d);
+    logi(DUALSHOCK4_DEFAULT_NAME ": device ready: %p\n", d);
     platform_instance_t *ins = default_get_ds4_platform_instance(d);
     ins->gamepad_seat = GAMEPAD_SEAT_A;
 
@@ -141,7 +142,7 @@ void default_ds4_platform_on_oob_event(uni_platform_oob_event_t event, void *dat
 {
 
     // Need to test all events on DS4, for now just log them
-    logi(DUALSHOCK4_NAME ": on_device_oob_event(): %d\n", event);
+    logi(DUALSHOCK4_DEFAULT_NAME ": on_device_oob_event(): %d\n", event);
 
     switch (event)
     {

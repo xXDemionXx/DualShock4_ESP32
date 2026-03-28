@@ -30,8 +30,12 @@ typedef enum
 
 // Callable functions
 
+void ds4Set_dataToESPQueu();
+void ds4Set_controllerComandsQueue();
 ds4_init_e ds4_init(void);
 void ds4_run_loop(void);
+// void ds4_autoconnect_mode();
+// void ds4_disconnect();
 // ds4_connection_error_e ds4_search_and_connect(void); // Connect to controller, report error
 // ds4_data_t ds4_recieve_data(void);
 // ds4_connection_error_e ds4_disconnect(void);
