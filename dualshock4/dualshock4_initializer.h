@@ -10,14 +10,16 @@
 #include <hci_dump.h>
 #include <hci_dump_embedded_stdout.h>
 #include <uni.h>
-#include "sdkconfig.h"  // We need to see CONFIG_BLUEPAD32_PLATFORM_CUSTOM
-#include "dualshock4.h" // Just for the DUALSHOCK4_NAME
+#include "sdkconfig.h" // We need to see CONFIG_BLUEPAD32_PLATFORM_CUSTOM
 //
 
 // Only custom platform is allowed
 #ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
 #error "Must use BLUEPAD32_PLATFORM_CUSTOM"
 #endif
+
+// Defines
+#define DUALSHOCK4_NAME "dualshock4" // Name of the controller (prefixes it's messages to the console)
 
 // Types
 typedef struct uni_platform *ds4_platform_handle;
