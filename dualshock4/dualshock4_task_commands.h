@@ -14,6 +14,7 @@
 #define DS4_COMMAND_TASK_SIZE 5 // In kB
 #define DS4_COMMAND_TASK_PRIORITY 5
 #define DS4_COMMAND_TASK_QUEUE_SIZE 3 // How many commands can fit
+#define DS4_COMMAND_TASK_MAX_TEST_WRITE_STRING_SIZE  20  // In chars
 
 // Types
 typedef enum
@@ -27,7 +28,7 @@ typedef enum
 typedef struct
 {
     ds4_command_task_init_error_e error_code;
-    QueueHandle_t command_task_queue_handle;
+    QueueHandle_t queue_handle;
 } ds4_command_task_init_return_t;
 
 typedef struct
@@ -39,7 +40,7 @@ typedef struct
 
 typedef struct
 {
-    char string[20];
+    char string[DS4_COMMAND_TASK_MAX_TEST_WRITE_STRING_SIZE];
 } ds4_command_test_write;
 
 typedef union
@@ -62,6 +63,12 @@ typedef struct
 } ds4_command_s;
 
 // Function prototypes
+
+/**
+ * @brief Initializes the commands task, returns an error code and queue handle.
+ *
+ * @return Struct {error code, queue handle}
+ */
 ds4_command_task_init_return_t ds4_init_commands_task(void);
 
 #endif

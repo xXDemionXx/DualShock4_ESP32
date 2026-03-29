@@ -23,7 +23,7 @@ ds4_command_task_init_return_t ds4_init_commands_task(void)
         return return_vals;
     }
     // Queue was created succesfully, we can store the handle for returning
-    return_vals.command_task_queue_handle = commands_queue_handle;
+    return_vals.queue_handle = commands_queue_handle;
 
     // Create the commands task
     if (pdPASS != xTaskCreate(&ds4_commands_task, "DS4 commands", DS4_COMMAND_TASK_SIZE, &commands_queue_handle, DS4_COMMAND_TASK_PRIORITY, NULL))

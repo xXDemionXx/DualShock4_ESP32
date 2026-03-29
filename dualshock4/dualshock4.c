@@ -1,6 +1,11 @@
 #include "dualshock4.h"
 
 #include "dualshock4_initializer.h"
+#include "dualshock4_task_commands.h"
+
+// Variables
+static QueueHandle_t commands_queue_handle = NULL;
+static QueueHandle_t receive_queue_handle = NULL;
 
 /**
  * @brief Sets up everything needed for ds4 before we can connect.
@@ -30,13 +35,32 @@ ds4_init_e ds4_init(void)
     if (uni_init(0 /* argc */, NULL /* argv */) != 0)
         return DS4_INIT_BLUEPAD_INIT_FAILED;
 
+    ds4_command_task_init_return_t command_task_init_return;
+    command_task_init_return = ds4_init_commands_task();
+    if (command_task_init_return.error_code != DS4_COMMAND_TASK_INIT_SUCCES)
+        return DS4_INIT_COMMAND_TASK_FAILED;
+    else
+        commands_queue_handle = command_task_init_return.queue_handle;
+
+    // ds4_command_task_init_error_e ds4_commaand_task_init_error;
+    //  ds4_commaand_task_init_error = ds4_commaand_task_init(commands_queue_handle)
+
     return DS4_INIT_SUCCESFUL;
 }
 
-void ds4Set_controllerComandsQueue()
+ds4_command_send_e ds4SendMessage(const char *message)
 {
-    // ds4_platform_handle ds4 = get_ds4_platform();
-    // ds4->
+    ds4_command_s command;
+    command.command_indicator = DS4_COMMAND_TYPE_TEST_WRITE;
+    strcpy((char *)&command.data.test_write_command.string, message);
+    if (pdTRUE == xQueueSend(commands_queue_handle, &command, portMAX_DELAY))
+    {
+        return DS4_COMMAND_SEND_SUCCES;
+    }
+    else
+    {
+        return DS4_COMMAND_SEND_FAIL;
+    }
 }
 
 void ds4_run_loop(void)
