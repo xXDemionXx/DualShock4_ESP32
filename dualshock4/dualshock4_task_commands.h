@@ -20,8 +20,15 @@ typedef enum
 {
     DS4_COMMAND_TASK_INIT_SUCCES,
     DS4_COMMAND_TASK_INIT_FAILED_QUEUE,
-    DS4_COMMAND_TASK_INIT_FAILED_TASK
+    DS4_COMMAND_TASK_INIT_FAILED_TASK,
+    DS4_COMMAND_TASK_INIT_STARTING_FAILURE
 } ds4_command_task_init_error_e;
+
+typedef struct
+{
+    ds4_command_task_init_error_e error_code;
+    QueueHandle_t command_task_queue_handle;
+} ds4_command_task_init_return_t;
 
 typedef struct
 {
@@ -55,6 +62,6 @@ typedef struct
 } ds4_command_s;
 
 // Function prototypes
-ds4_command_task_init_error_e ds4_init_commands_task(QueueHandle_t commands_queue_handle);
+ds4_command_task_init_return_t ds4_init_commands_task(void);
 
 #endif
