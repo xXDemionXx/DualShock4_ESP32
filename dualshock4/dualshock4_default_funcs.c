@@ -1,5 +1,6 @@
 #include "dualshock4_initializer.h"
 #include "dualshock4_default_funcs.h"
+#include "dualshock4_connection_status_modify.h"
 
 // Function prototypes
 // static void trigger_event_on_gamepad(uni_hid_device_t* d); Unimplemented yet
@@ -95,8 +96,7 @@ uni_error_t default_ds4_platform_on_device_discovered(bd_addr_t addr, const char
  */
 void default_ds4_platform_on_device_connected(uni_hid_device_t *d)
 {
-    ds4_connection_status_e *connection_status = access_ds4_connection_status();
-    *connection_status = DS4_CONNECTED;
+    set_ds4_connection_status(DS4_CONNECTED);
     logi(DUALSHOCK4_DEFAULT_NAME ": device connected: %p\n", d);
 }
 
@@ -109,8 +109,7 @@ void default_ds4_platform_on_device_connected(uni_hid_device_t *d)
  */
 void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
 {
-    ds4_connection_status_e *connection_status = access_ds4_connection_status();
-    *connection_status = DS4_DISCONNECTED;
+    set_ds4_connection_status(DS4_DISCONNECTED);
     logi(DUALSHOCK4_DEFAULT_NAME ": device disconnected: %p\n", d);
 }
 
@@ -124,8 +123,6 @@ void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
  */
 uni_error_t default_ds4_platform_on_device_ready(uni_hid_device_t *d)
 {
-    ds4_connection_status_e *connection_status = access_ds4_connection_status();
-    *connection_status = DS4_READY;
     logi(DUALSHOCK4_DEFAULT_NAME ": device ready: %p\n", d);
     platform_instance_t *ins = default_get_ds4_platform_instance(d);
     ins->gamepad_seat = GAMEPAD_SEAT_A;

@@ -1,8 +1,6 @@
 #include "dualshock4_initializer.h"
 #include "dualshock4_default_funcs.h"
 
-static ds4_connection_status_e ds4_connection_status = DS4_DISCONNECTED;
-
 // This is the global instance that holds all callbacks for DS4.
 static ds4_platform ds4 = {
     .name = DUALSHOCK4_DEFAULT_NAME,
@@ -23,11 +21,4 @@ static ds4_platform ds4 = {
 ds4_platform_handle get_ds4_platform(void)
 {
     return &ds4;
-}
-
-/**
- * @brief Returns the pointer to the connection status variable
- */
-ds4_connection_status_e *access_ds4_connection_status(void){
-    return &ds4_connection_status;
 }
