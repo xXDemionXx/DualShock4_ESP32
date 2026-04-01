@@ -2,6 +2,8 @@
 
 #include "dualshock4_initializer.h"
 #include "dualshock4_task_commands.h"
+#include "dualshock4_connection_status_modify.h"
+
 
 // Variables
 static QueueHandle_t commands_queue_handle = NULL;
@@ -35,6 +37,9 @@ ds4_init_e ds4_init(void)
     if (uni_init(0 /* argc */, NULL /* argv */) != 0)
         return DS4_INIT_BLUEPAD_INIT_FAILED;
 
+    // Needed for global connection status checking
+    ds4_init_connection_status();
+
     ds4_command_task_init_return_t command_task_init_return;
     command_task_init_return = ds4_init_commands_task();
     if (command_task_init_return.error_code != DS4_COMMAND_TASK_INIT_SUCCES)
@@ -47,6 +52,11 @@ ds4_init_e ds4_init(void)
 
     return DS4_INIT_SUCCES;
 }
+
+// ds4_connection_status_e ds4GetConnectionStatus(void){
+//     return atomic_load(access_ds4_connection_status());
+// }
+
 
 ds4_command_send_e ds4SendMessage(const char *message)
 {

@@ -39,6 +39,13 @@ void ds4_run_loop(void);
  * @return Error code
  */
 ds4_command_send_e ds4SendMessage(const char *message);
+
+/**
+ * @brief Returns the connection status
+ * 
+ * @return Connection status
+ */
+ds4_connection_status_e ds4GetConnectionStatus(void);
 // void ds4_autoconnect_mode();
 // void ds4_disconnect();
 // ds4_connection_error_e ds4_search_and_connect(void); // Connect to controller, report error

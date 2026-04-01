@@ -5,7 +5,7 @@ static QueueHandle_t commands_queue_handle = NULL;
 
 // Private function prototypes
 static void ds4_commands_task(void *p_parameter);
-static void change_lightbar(void);
+static void change_lightbar(ds4_command_change_lightbar command);
 static void rumble(void);
 static void test_write(ds4_command_test_write);
 
@@ -60,7 +60,7 @@ static void ds4_commands_task(void *p_parameter)
             switch (command_packet.command_indicator)
             {
             case (DS4_COMMAND_TYPE_CHANGE_LIGHTBAR):
-                change_lightbar();
+                change_lightbar(command_packet.data.lightbar_command);
                 break;
             case (DS4_COMMAND_TYPE_RUMBLE):
                 rumble();
@@ -78,7 +78,7 @@ static void ds4_commands_task(void *p_parameter)
 
 // Possible commands
 
-static void change_lightbar(void)
+static void change_lightbar(ds4_command_change_lightbar command)
 {
     // For now nothing
     ESP_LOGI(TAG, "Change lightbar");

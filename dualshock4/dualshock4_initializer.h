@@ -10,6 +10,7 @@
 #include <hci_dump.h>
 #include <hci_dump_embedded_stdout.h>
 #include <uni.h>
+#include "dualshock4_connection_status.h"
 #include "sdkconfig.h" // We need to see CONFIG_BLUEPAD32_PLATFORM_CUSTOM
 //
 
