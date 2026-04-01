@@ -123,6 +123,7 @@ void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
  */
 uni_error_t default_ds4_platform_on_device_ready(uni_hid_device_t *d)
 {
+    set_ds4_connection_status(DS4_READY);
     logi(DUALSHOCK4_DEFAULT_NAME ": device ready: %p\n", d);
     platform_instance_t *ins = default_get_ds4_platform_instance(d);
     ins->gamepad_seat = GAMEPAD_SEAT_A;
