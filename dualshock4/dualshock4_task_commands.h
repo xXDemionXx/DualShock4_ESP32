@@ -6,15 +6,16 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
+#include "dualshock4_initializer.h"
 #include "esp_log.h"
 #include "stdint.h"
 
 // Defines
 #define NUM_TO_KB(x) x * 1024
-#define DS4_COMMAND_TASK_SIZE 5                         // In kB
-#define DS4_COMMAND_TASK_PRIORITY 5
-#define DS4_COMMAND_TASK_QUEUE_SIZE 3                   // How many commands can fit
-#define DS4_COMMAND_TASK_MAX_TEST_WRITE_STRING_SIZE 20  // In chars
+#define DS4_COMMAND_TASK_SIZE 5 // In kB
+#define DS4_COMMAND_TASK_PRIORITY 2
+#define DS4_COMMAND_TASK_QUEUE_SIZE 10                 // How many commands can fit
+#define DS4_COMMAND_TASK_MAX_TEST_WRITE_STRING_SIZE 20 // In chars
 
 // Types
 typedef enum
@@ -51,7 +52,7 @@ typedef union
 
 typedef enum
 {
-    DS4_COMMAND_TYPE_CHANGE_LIGHTBAR,
+    DS4_COMMAND_TYPE_LIGHTBAR,
     DS4_COMMAND_TYPE_RUMBLE,
     DS4_COMMAND_TYPE_TEST_WRITE
 } ds4_command_type_e;
@@ -59,6 +60,7 @@ typedef enum
 typedef struct
 {
     uint8_t command_indicator; // Use ds4_command_type_e for this
+    ds4_device_handle device;
     ds4_command_types_u data;
 } ds4_command_s;
 

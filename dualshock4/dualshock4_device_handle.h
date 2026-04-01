@@ -16,4 +16,9 @@ void ds4_set_device_handle(ds4_device_handle *device);
  */
 void ds4_pass_device_handle(ds4_device_handle device);
 
+/**
+ * @brief Passes the handle to dualshock4 API's variable.
+ */
+ds4_device_handle ds4_getd_evice_handle(void);
+
 #endif // DUALSHOCK4_DEVICE_PASS_H

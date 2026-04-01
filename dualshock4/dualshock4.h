@@ -24,7 +24,8 @@ typedef enum
 
 typedef enum
 {
-    DS4_COMMAND_SEND_FAIL,
+    DS4_COMMAND_SEND_FAIL_NO_CONTROLLER,
+    DS4_COMMAND_SEND_FAIL_QUEUE,
     DS4_COMMAND_SEND_SUCCES
 } ds4_command_send_e;
 
@@ -41,8 +42,15 @@ void ds4_run_loop(void);
 ds4_command_send_e ds4SendMessage(const char *message);
 
 /**
+ * @brief Set the RGB value of the lightbar
+ *
+ * @return Error code
+ */
+ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B);
+
+/**
  * @brief Returns the connection status
- * 
+ *
  * @return Connection status
  */
 ds4_connection_status_e ds4GetConnectionStatus(void);

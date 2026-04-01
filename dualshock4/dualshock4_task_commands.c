@@ -1,16 +1,16 @@
 #include "dualshock4_task_commands.h"
+#include "dualshock4_device_handle.h"
 
 // Private variables
 static QueueHandle_t commands_queue_handle = NULL;
 
 // Private function prototypes
 static void ds4_commands_task(void *p_parameter);
-static void change_lightbar(ds4_command_change_lightbar command);
+static void change_lightbar(ds4_command_change_lightbar command, ds4_device_handle d);
 static void rumble(void);
 static void test_write(ds4_command_test_write);
 
 static const char *TAG = "ds4_command";
-
 
 ds4_command_task_init_return_t ds4_init_commands_task(void)
 {
@@ -51,6 +51,7 @@ static void ds4_commands_task(void *p_parameter)
 {
     // QueueHandle_t commands_queue_handle = *(QueueHandle_t *)p_parameter;
     // QueueHandle_t commands_queue_handle;
+
     ds4_command_s command_packet;
 
     for (;;)
@@ -59,8 +60,8 @@ static void ds4_commands_task(void *p_parameter)
         {
             switch (command_packet.command_indicator)
             {
-            case (DS4_COMMAND_TYPE_CHANGE_LIGHTBAR):
-                change_lightbar(command_packet.data.lightbar_command);
+            case (DS4_COMMAND_TYPE_LIGHTBAR):
+                change_lightbar(command_packet.data.lightbar_command, command_packet.device);
                 break;
             case (DS4_COMMAND_TYPE_RUMBLE):
                 rumble();
@@ -78,10 +79,12 @@ static void ds4_commands_task(void *p_parameter)
 
 // Possible commands
 
-static void change_lightbar(ds4_command_change_lightbar command)
+static void change_lightbar(ds4_command_change_lightbar command, ds4_device_handle d)
 {
     // For now nothing
     ESP_LOGI(TAG, "Change lightbar");
+
+    ((uni_hid_device_t*)d)->report_parser.set_lightbar_color((uni_hid_device_t*)d, command.R, command.G, command.B);
 }
 
 static void rumble(void)
