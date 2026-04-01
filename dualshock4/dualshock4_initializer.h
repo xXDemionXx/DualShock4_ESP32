@@ -33,7 +33,7 @@ typedef struct platform_instance_s
 typedef enum
 {
     DS4_READY,
-    DS4_CONNECTING,
+    DS4_CONNECTED,
     DS4_DISCONNECTED
 } ds4_connection_status_e;
 
