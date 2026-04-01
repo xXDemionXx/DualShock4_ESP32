@@ -3,11 +3,12 @@
 #include "dualshock4_initializer.h"
 #include "dualshock4_task_commands.h"
 #include "dualshock4_connection_status_modify.h"
-
+#include "dualshock4_device_handle.h"
 
 // Variables
 static QueueHandle_t commands_queue_handle = NULL;
-static QueueHandle_t receive_queue_handle = NULL;
+// static QueueHandle_t receive_queue_handle = NULL;
+static ds4_device_handle ds4 = NULL;
 
 /**
  * @brief Sets up everything needed for ds4 before we can connect.
@@ -28,6 +29,8 @@ ds4_init_e ds4_init(void)
     // Configure BTstack for ESP32 VHCI Controller
     if (btstack_init() != 0)
         return DS4_INIT_BTSTACK_INIT_FAILED;
+
+    ds4_set_device_handle(&ds4);
 
     // Get pointer to a struct containing all functions for the platform
     // Then set that struct for uni platform
@@ -63,7 +66,7 @@ ds4_command_send_e ds4SendMessage(const char *message)
     ds4_command_s command;
     command.command_indicator = DS4_COMMAND_TYPE_TEST_WRITE;
     strcpy((char *)&command.data.test_write_command.string, message);
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, 100 / portTICK_PERIOD_MS))
+    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(100)))
     {
         return DS4_COMMAND_SEND_SUCCES;
     }

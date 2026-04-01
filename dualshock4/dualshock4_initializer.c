@@ -2,7 +2,7 @@
 #include "dualshock4_default_funcs.h"
 
 // This is the global instance that holds all callbacks for DS4.
-static ds4_platform ds4 = {
+static ds4_platform ds4_plat = {
     .name = DUALSHOCK4_DEFAULT_NAME,
     .init = default_ds4_platform_init,
     .on_init_complete = default_ds4_platform_init_on_init_complete,
@@ -20,5 +20,5 @@ static ds4_platform ds4 = {
  */
 ds4_platform_handle get_ds4_platform(void)
 {
-    return &ds4;
+    return &ds4_plat;
 }
