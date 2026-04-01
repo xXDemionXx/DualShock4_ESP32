@@ -45,7 +45,7 @@ ds4_init_e ds4_init(void)
     // ds4_command_task_init_error_e ds4_commaand_task_init_error;
     //  ds4_commaand_task_init_error = ds4_commaand_task_init(commands_queue_handle)
 
-    return DS4_INIT_SUCCESFUL;
+    return DS4_INIT_SUCCES;
 }
 
 ds4_command_send_e ds4SendMessage(const char *message)
@@ -53,7 +53,7 @@ ds4_command_send_e ds4SendMessage(const char *message)
     ds4_command_s command;
     command.command_indicator = DS4_COMMAND_TYPE_TEST_WRITE;
     strcpy((char *)&command.data.test_write_command.string, message);
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, portMAX_DELAY))
+    if (pdTRUE == xQueueSend(commands_queue_handle, &command, 100 / portTICK_PERIOD_MS))
     {
         return DS4_COMMAND_SEND_SUCCES;
     }

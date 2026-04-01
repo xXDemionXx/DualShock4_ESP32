@@ -15,7 +15,7 @@
  */
 typedef enum
 {
-    DS4_INIT_SUCCESFUL,
+    DS4_INIT_SUCCES,
     DS4_INIT_BTSTACK_INIT_FAILED,
     DS4_INIT_BLUEPAD_INIT_FAILED,
     DS4_INIT_COMMAND_TASK_FAILED,
@@ -30,8 +30,6 @@ typedef enum
 
 // Callable functions
 
-void ds4Set_dataToESPQueu();
-void ds4Set_controllerComandsQueue();
 ds4_init_e ds4_init(void);
 void ds4_run_loop(void);
 

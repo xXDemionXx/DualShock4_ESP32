@@ -11,10 +11,10 @@
 
 // Defines
 #define NUM_TO_KB(x) x * 1024
-#define DS4_COMMAND_TASK_SIZE 5 // In kB
+#define DS4_COMMAND_TASK_SIZE 5                         // In kB
 #define DS4_COMMAND_TASK_PRIORITY 5
-#define DS4_COMMAND_TASK_QUEUE_SIZE 3 // How many commands can fit
-#define DS4_COMMAND_TASK_MAX_TEST_WRITE_STRING_SIZE  20  // In chars
+#define DS4_COMMAND_TASK_QUEUE_SIZE 3                   // How many commands can fit
+#define DS4_COMMAND_TASK_MAX_TEST_WRITE_STRING_SIZE 20  // In chars
 
 // Types
 typedef enum

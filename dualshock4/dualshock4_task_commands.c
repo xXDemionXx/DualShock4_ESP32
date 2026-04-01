@@ -9,6 +9,9 @@ static void change_lightbar(void);
 static void rumble(void);
 static void test_write(ds4_command_test_write);
 
+static const char *TAG = "ds4_command";
+
+
 ds4_command_task_init_return_t ds4_init_commands_task(void)
 {
     ds4_command_task_init_return_t return_vals;
@@ -26,7 +29,7 @@ ds4_command_task_init_return_t ds4_init_commands_task(void)
     return_vals.queue_handle = commands_queue_handle;
 
     // Create the commands task
-    if (pdPASS != xTaskCreate(&ds4_commands_task, "DS4 commands", DS4_COMMAND_TASK_SIZE, &commands_queue_handle, DS4_COMMAND_TASK_PRIORITY, NULL))
+    if (pdPASS != xTaskCreate(&ds4_commands_task, "DS4 commands", NUM_TO_KB(DS4_COMMAND_TASK_SIZE), &commands_queue_handle, DS4_COMMAND_TASK_PRIORITY, NULL))
     {
         return_vals.error_code = DS4_COMMAND_TASK_INIT_FAILED_TASK;
         return return_vals;
@@ -35,8 +38,6 @@ ds4_command_task_init_return_t ds4_init_commands_task(void)
     return_vals.error_code = DS4_COMMAND_TASK_INIT_SUCCES;
     return return_vals;
 }
-
-static const char *TAG = "queue_example";
 
 // Public functions
 QueueHandle_t ds4_command_task_get_queue_handle(void)
@@ -48,7 +49,8 @@ QueueHandle_t ds4_command_task_get_queue_handle(void)
 
 static void ds4_commands_task(void *p_parameter)
 {
-    QueueHandle_t commands_queue_handle = *(QueueHandle_t *)p_parameter;
+    // QueueHandle_t commands_queue_handle = *(QueueHandle_t *)p_parameter;
+    // QueueHandle_t commands_queue_handle;
     ds4_command_s command_packet;
 
     for (;;)
@@ -70,7 +72,7 @@ static void ds4_commands_task(void *p_parameter)
                 ESP_LOGI(TAG, "Unknown command for DS4");
             }
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
