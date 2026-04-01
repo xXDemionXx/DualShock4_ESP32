@@ -30,7 +30,15 @@ typedef struct platform_instance_s
     uni_gamepad_seat_t gamepad_seat; // which "seat" is being used
 } platform_instance_t;
 
+typedef enum
+{
+    DS4_READY,
+    DS4_CONNECTING,
+    DS4_DISCONNECTED
+} ds4_connection_status_e;
+
 // Function prototypes
 ds4_platform_handle get_ds4_platform(void);
+ds4_connection_status_e *access_ds4_connection_status(void);
 
 #endif // DUALSHOCK4_INITIALIZER_H
