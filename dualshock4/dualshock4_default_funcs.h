@@ -2,6 +2,7 @@
 #define DUALSHOCK4_DEFAULT_FUNCS_H
 
 #include "dualshock4_initializer.h"
+#include "dualshock4_device_handle.h"
 
 // Defines
 #define DUALSHOCK4_DEFAULT_NAME "dualshock4" // Name of the controller (prefixes it's messages to the console)

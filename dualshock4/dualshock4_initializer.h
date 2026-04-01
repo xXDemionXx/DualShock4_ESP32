@@ -25,6 +25,8 @@
 // Types
 typedef struct uni_platform ds4_platform;
 typedef struct uni_platform *ds4_platform_handle;
+typedef struct uni_hid_device_t ds4_device;
+typedef struct uni_hid_device_t *ds4_device_handle;
 typedef struct platform_instance_s
 {
     uni_gamepad_seat_t gamepad_seat; // which "seat" is being used
