@@ -41,12 +41,21 @@ typedef struct
 
 typedef struct
 {
+    uint8_t magnitude_weak;
+    uint8_t magnitude_strong;
+    uint16_t duration;
+    uint16_t start_delay;
+} ds4_command_rumble;
+
+typedef struct
+{
     char string[DS4_COMMAND_TASK_MAX_TEST_WRITE_STRING_SIZE];
 } ds4_command_test_write;
 
 typedef union
 {
     ds4_command_change_lightbar lightbar_command;
+    ds4_command_rumble rumble_command;
     ds4_command_test_write test_write_command;
 } ds4_command_types_u;
 

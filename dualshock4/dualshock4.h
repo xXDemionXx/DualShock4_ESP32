@@ -31,7 +31,13 @@ typedef enum
 
 // Callable functions
 
+/**
+ * @brief Sets up everything needed for ds4 before we can connect.
+ *
+ * @return With what state did the initialization exit.
+ */
 ds4_init_e ds4_init(void);
+
 void ds4_run_loop(void);
 
 /**
@@ -47,6 +53,55 @@ ds4_command_send_e ds4SendMessage(const char *message);
  * @return Error code
  */
 ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B);
+
+/**
+ * @brief Play rumble on the controller
+ * 
+ * This function sends the same magnitude to the weak and strong motors.
+ *
+ * @param magnitude How strong should the rumble be (0-255)
+ * @param duration How long the rumble will last in ms
+ * @param start_delay After what time after receiving will the rumble start in ms
+ * @return Error code
+ */
+ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t start_delay);
+
+/**
+ * @brief Play weak rumble on the controller
+ * 
+ * This function sends the magnitude only to the weak motor.
+ *
+ * @param magnitude How strong should the rumble be (0-255)
+ * @param duration How long the rumble will last in ms
+ * @param start_delay After what time after receiving will the rumble start in ms
+ * @return Error code
+ */
+ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint16_t start_delay);
+
+/**
+ * @brief Play weak rumble on the controller
+ * 
+ * This function sends the magnitude only to the strong motor.
+ *
+ * @param magnitude How strong should the rumble be (0-255)
+ * @param duration How long the rumble will last in ms
+ * @param start_delay After what time after receiving will the rumble start in ms
+ * @return Error code
+ */
+ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_delay);
+
+/**
+ * @brief Play weak rumble on the controller
+ * 
+ * This function allows you to send specific values to the weak and strong motor.
+ *
+ * @param magnitude_weak How strong should the rumble be on the weak motor (0-255)
+ * @param magnitude_strong How strong should the rumble be on the strong motor (0-255)
+ * @param duration How long the rumble will last in ms
+ * @param start_delay After what time after receiving will the rumble start in ms
+ * @return Error code
+ */
+ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay);
 
 /**
  * @brief Returns the connection status

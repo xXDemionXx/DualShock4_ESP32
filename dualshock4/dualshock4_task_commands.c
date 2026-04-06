@@ -7,7 +7,7 @@ static QueueHandle_t commands_queue_handle = NULL;
 // Private function prototypes
 static void ds4_commands_task(void *p_parameter);
 static void change_lightbar(ds4_command_change_lightbar command, ds4_device_handle d);
-static void rumble(void);
+static void rumble(ds4_command_rumble command, ds4_device_handle d);
 static void test_write(ds4_command_test_write);
 
 static const char *TAG = "ds4_command";
@@ -64,7 +64,7 @@ static void ds4_commands_task(void *p_parameter)
                 change_lightbar(command_packet.data.lightbar_command, command_packet.device);
                 break;
             case (DS4_COMMAND_TYPE_RUMBLE):
-                rumble();
+                rumble(command_packet.data.rumble_command, command_packet.device);
                 break;
             case (DS4_COMMAND_TYPE_TEST_WRITE):
                 test_write(command_packet.data.test_write_command);
@@ -81,16 +81,14 @@ static void ds4_commands_task(void *p_parameter)
 
 static void change_lightbar(ds4_command_change_lightbar command, ds4_device_handle d)
 {
-    // For now nothing
     ESP_LOGI(TAG, "Change lightbar");
-
     ((uni_hid_device_t*)d)->report_parser.set_lightbar_color((uni_hid_device_t*)d, command.R, command.G, command.B);
 }
 
-static void rumble(void)
+static void rumble(ds4_command_rumble command, ds4_device_handle d)
 {
-    // For now nothing
     ESP_LOGI(TAG, "Rumble");
+    ((uni_hid_device_t*)d)->report_parser.play_dual_rumble((uni_hid_device_t*)d, command.start_delay, command.duration, command.magnitude_weak, command.magnitude_strong);
 }
 
 static void test_write(ds4_command_test_write command)

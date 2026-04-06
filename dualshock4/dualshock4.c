@@ -5,6 +5,10 @@
 #include "dualshock4_connection_status_modify.h"
 #include "dualshock4_device_handle.h"
 
+// Local defines
+#define DS4_COMMAND_TASK_SEND_TIME 100 // In ms
+//
+
 // Variables
 static QueueHandle_t commands_queue_handle = NULL;
 // static QueueHandle_t receive_queue_handle = NULL;
@@ -56,21 +60,17 @@ ds4_init_e ds4_init(void)
     return DS4_INIT_SUCCES;
 }
 
-// ds4_connection_status_e ds4GetConnectionStatus(void){
-//     return atomic_load(access_ds4_connection_status());
-// }
-
 ds4_command_send_e ds4SendMessage(const char *message)
 {
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
-    
+
     ds4_command_s command;
     command.command_indicator = DS4_COMMAND_TYPE_TEST_WRITE;
-    command.device = ds4;   // Pass the device handle
+    command.device = ds4; // Pass the device handle
     strcpy((char *)&command.data.test_write_command.string, message);
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(100)))
+    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
     {
         return DS4_COMMAND_SEND_SUCCES;
     }
@@ -85,14 +85,106 @@ ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
-    
+
     ds4_command_s command;
     command.command_indicator = DS4_COMMAND_TYPE_LIGHTBAR;
-    command.device = ds4;   // Pass the device handle
+    command.device = ds4; // Pass the device handle
     command.data.lightbar_command.R = R;
     command.data.lightbar_command.G = G;
     command.data.lightbar_command.B = B;
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(100)))
+    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
+    {
+        return DS4_COMMAND_SEND_SUCCES;
+    }
+    else
+    {
+        return DS4_COMMAND_SEND_FAIL_QUEUE;
+    }
+}
+
+ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
+{
+    // Controller not connected or no device handle
+    if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
+        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+
+    ds4_command_s command;
+    command.command_indicator = DS4_COMMAND_TYPE_RUMBLE;
+    command.device = ds4; // Pass the device handle
+    command.data.rumble_command.magnitude_weak = magnitude;
+    command.data.rumble_command.magnitude_strong = magnitude;
+    command.data.rumble_command.duration = duration;
+    command.data.rumble_command.start_delay = start_delay;
+    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
+    {
+        return DS4_COMMAND_SEND_SUCCES;
+    }
+    else
+    {
+        return DS4_COMMAND_SEND_FAIL_QUEUE;
+    }
+}
+
+ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
+{
+    // Controller not connected or no device handle
+    if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
+        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+
+    ds4_command_s command;
+    command.command_indicator = DS4_COMMAND_TYPE_RUMBLE;
+    command.device = ds4; // Pass the device handle
+    command.data.rumble_command.magnitude_weak = magnitude;
+    command.data.rumble_command.magnitude_strong = 0;
+    command.data.rumble_command.duration = duration;
+    command.data.rumble_command.start_delay = start_delay;
+    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
+    {
+        return DS4_COMMAND_SEND_SUCCES;
+    }
+    else
+    {
+        return DS4_COMMAND_SEND_FAIL_QUEUE;
+    }
+}
+
+ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
+{
+    // Controller not connected or no device handle
+    if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
+        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+
+    ds4_command_s command;
+    command.command_indicator = DS4_COMMAND_TYPE_RUMBLE;
+    command.device = ds4; // Pass the device handle
+    command.data.rumble_command.magnitude_weak = 0;
+    command.data.rumble_command.magnitude_strong = magnitude;
+    command.data.rumble_command.duration = duration;
+    command.data.rumble_command.start_delay = start_delay;
+    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
+    {
+        return DS4_COMMAND_SEND_SUCCES;
+    }
+    else
+    {
+        return DS4_COMMAND_SEND_FAIL_QUEUE;
+    }
+}
+
+ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay)
+{
+    // Controller not connected or no device handle
+    if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
+        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+
+    ds4_command_s command;
+    command.command_indicator = DS4_COMMAND_TYPE_RUMBLE;
+    command.device = ds4; // Pass the device handle
+    command.data.rumble_command.magnitude_weak = magnitude_weak;
+    command.data.rumble_command.magnitude_strong = magnitude_strong;
+    command.data.rumble_command.duration = duration;
+    command.data.rumble_command.start_delay = start_delay;
+    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
     {
         return DS4_COMMAND_SEND_SUCCES;
     }
