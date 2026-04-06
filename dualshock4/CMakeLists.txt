@@ -1,18 +1,3 @@
-# set(srcs
-#          "dualshock4_initializer.c" 
-#          "dualshock4.c"
-#          "dualshock4_default_funcs.c"
-#          "dualshock4_task_commands.c")
-
-# set(includes
-#          "."
-#          "tasks/commands/"
-#         )
-
-# idf_component_register(SRCS ${srcs}
-#                        INCLUDE_DIRS ${includes}
-#                        REQUIRES bluepad32 btstack)
-
 set(srcs
          "dualshock4_initializer.c" 
          "dualshock4.c"
@@ -20,8 +5,21 @@ set(srcs
          "dualshock4_task_commands.c"
          "dualshock4_connection_status.c"
          "dualshock4_connection_status_modify.c"
-         "dualshock4_device_handle.c")
+         "dualshock4_device_handle.c"
+         )
+
+set(includes
+         "."
+        )
+
+if(CONFIG_DS4_MODE_EVENT)
+    list(APPEND srcs "receive/event_driven/events.c")
+    list(APPEND includes "receive/event_driven")
+elseif(CONFIG_DS4_MODE_POLLING)
+    list(APPEND srcs "receive/polling/polling.c")
+    list(APPEND includes "receive/polling")
+endif()
 
 idf_component_register(SRCS ${srcs}
-                       INCLUDE_DIRS .
+                       INCLUDE_DIRS ${includes}
                        REQUIRES bluepad32 btstack)

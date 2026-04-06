@@ -5,6 +5,7 @@
 
 #include "dualshock4_initializer.h"
 #include "dualshock4_task_commands.h"
+#include "controller_data_type.h"
 
 // Defines
 
@@ -56,7 +57,7 @@ ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B);
 
 /**
  * @brief Play rumble on the controller
- * 
+ *
  * This function sends the same magnitude to the weak and strong motors.
  *
  * @param magnitude How strong should the rumble be (0-255)
@@ -68,7 +69,7 @@ ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t 
 
 /**
  * @brief Play weak rumble on the controller
- * 
+ *
  * This function sends the magnitude only to the weak motor.
  *
  * @param magnitude How strong should the rumble be (0-255)
@@ -80,7 +81,7 @@ ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint1
 
 /**
  * @brief Play weak rumble on the controller
- * 
+ *
  * This function sends the magnitude only to the strong motor.
  *
  * @param magnitude How strong should the rumble be (0-255)
@@ -92,7 +93,7 @@ ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uin
 
 /**
  * @brief Play weak rumble on the controller
- * 
+ *
  * This function allows you to send specific values to the weak and strong motor.
  *
  * @param magnitude_weak How strong should the rumble be on the weak motor (0-255)
@@ -109,6 +110,26 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
  * @return Connection status
  */
 ds4_connection_status_e ds4GetConnectionStatus(void);
+
+// When event mode set in config
+#ifdef CONFIG_DS4_MODE_EVENT
+//
+#endif
+
+// When polling mode set in config
+#ifdef CONFIG_DS4_MODE_POLLING
+
+/**
+ * @brief Pass the pointer to your ds4_data_t variable that you can use for polling
+ *
+ * Access your variable like you are accessing a normal struct. The polling aproach will
+ * not guarante that you allways read the freshest data, just that incoming controller
+ * data will continuously be saved into the variable given by the pointer.
+ */
+void ds4SetDataPolling(ds4_data_t *p);
+
+#endif
+
 // void ds4_autoconnect_mode();
 // void ds4_disconnect();
 // ds4_connection_error_e ds4_search_and_connect(void); // Connect to controller, report error
