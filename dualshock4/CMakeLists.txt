@@ -10,6 +10,7 @@ set(srcs
 
 set(includes
          "."
+         "receive"
         )
 
 if(CONFIG_DS4_MODE_EVENT)

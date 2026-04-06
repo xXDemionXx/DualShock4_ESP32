@@ -1,5 +1,5 @@
-#ifndef CONTROLLER_DATA_TYPE_H
-#define CONTROLLER_DATA_TYPE_H
+#ifndef DS4_RECEIVE_TYPES_H
+#define DS4_RECEIVE_TYPES_H
 
 #include <stdint.h>
 

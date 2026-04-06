@@ -5,7 +5,6 @@
 
 #include "dualshock4_initializer.h"
 #include "dualshock4_task_commands.h"
-#include "controller_data_type.h"
 
 // Defines
 
@@ -119,6 +118,9 @@ ds4_connection_status_e ds4GetConnectionStatus(void);
 // When polling mode set in config
 #ifdef CONFIG_DS4_MODE_POLLING
 
+#include "ds4_polling.h"
+#include "ds4_receive_type.h"
+
 /**
  * @brief Pass the pointer to your ds4_data_t variable that you can use for polling
  *
@@ -126,7 +128,7 @@ ds4_connection_status_e ds4GetConnectionStatus(void);
  * not guarante that you allways read the freshest data, just that incoming controller
  * data will continuously be saved into the variable given by the pointer.
  */
-void ds4SetDataPolling(ds4_data_t *p);
+void ds4SetPollingStruct(ds4_data_t *p);
 
 #endif
 

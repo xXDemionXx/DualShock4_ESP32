@@ -1,0 +1,15 @@
+menu "DualShock4 Configuration"
+
+    choice DS4_MODE
+        prompt "DualShock4 operation mode"
+        default DS4_MODE_EVENT
+    
+    config DS4_MODE_EVENT
+        bool "Event-based mode"
+
+    config DS4_MODE_POLLING
+        bool "Polling mode"
+
+    endchoice
+
+endmenu

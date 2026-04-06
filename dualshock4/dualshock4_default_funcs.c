@@ -3,6 +3,15 @@
 #include "dualshock4_connection_status_modify.h"
 #include "dualshock4_device_handle.h"
 
+#ifdef CONFIG_DS4_MODE_POLLING
+#include "ds4_polling.h"
+#endif
+
+#ifdef CONFIG_DS4_MODE_EVENT
+#include "ds4_polling.h"
+#endif
+
+
 // Function prototypes
 // static void trigger_event_on_gamepad(uni_hid_device_t* d); Unimplemented yet
 platform_instance_t *default_get_ds4_platform_instance(uni_hid_device_t *d);
@@ -193,49 +202,14 @@ void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller
         return;
     }
     prev = *ctl;
-    // Print device Id before dumping gamepad.
-    // This could be very CPU intensive and might crash the ESP32.
-    // Remove these 2 lines in production code.
-    // logi("(%p), id=%d, \n", d, uni_hid_device_get_idx_for_instance(d));
-    // uni_controller_dump(ctl);
 
-    // switch (ctl->klass) {
-    //     case UNI_CONTROLLER_CLASS_GAMEPAD:
-    //         gp = &ctl->gamepad;
+    #ifdef CONFIG_DS4_MODE_POLLING
+    ds4_polling_send((ds4_data_t *) ctl);
+    #endif
 
-    //         // Debugging
-    //         // Axis ry: control rumble
-    //         if ((gp->buttons & BUTTON_A) && d->report_parser.play_dual_rumble != NULL) {
-    //             d->report_parser.play_dual_rumble(d, 0 /* delayed start ms */, 250 /* duration ms */,
-    //                                               255 /* weak magnitude */, 0 /* strong magnitude */);
-    //         }
-    //         // Buttons: Control LEDs On/Off
-    //         if ((gp->buttons & BUTTON_B) && d->report_parser.set_player_leds != NULL) {
-    //             d->report_parser.set_player_leds(d, leds++ & 0x0f);
-    //         }
-    //         // Axis: control RGB color
-    //         if ((gp->buttons & BUTTON_X) && d->report_parser.set_lightbar_color != NULL) {
-    //             uint8_t r = (gp->axis_x * 256) / 512;
-    //             uint8_t g = (gp->axis_y * 256) / 512;
-    //             uint8_t b = (gp->axis_rx * 256) / 512;
-    //             d->report_parser.set_lightbar_color(d, r, g, b);
-    //         }
+    #ifdef CONFIG_DS4_MODE_EVENT
 
-    //         // Toggle Bluetooth connections
-    //         if ((gp->buttons & BUTTON_SHOULDER_L) && enabled) {
-    //             logi("*** Stop scanning\n");
-    //             uni_bt_stop_scanning_safe();
-    //             enabled = false;
-    //         }
-    //         if ((gp->buttons & BUTTON_SHOULDER_R) && !enabled) {
-    //             logi("*** Start scanning\n");
-    //             uni_bt_start_scanning_and_autoconnect_safe();
-    //             enabled = true;
-    //         }
-    //         break;
-    //     default:
-    //         break;
-    // }
+    #endif
 }
 
 /**
