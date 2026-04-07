@@ -204,7 +204,7 @@ void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller
     prev = *ctl;
 
     #ifdef CONFIG_DS4_MODE_POLLING
-    ds4_polling_send((ds4_data_t *) &ctl);
+    ds4_polling_send((ds4_data_t *) &ctl->gamepad);
     #endif
 
     #ifdef CONFIG_DS4_MODE_EVENT
