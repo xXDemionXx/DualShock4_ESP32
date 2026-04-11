@@ -4,22 +4,25 @@
 #include "ds4_receive_type.h"
 #include "ds4_event_handling_init.h"
 #include "ds4_btn_config.h"
+#include "btn_events.h"
 #include "stdint.h"
 #include <string.h>
 
 // Helper macro that extracts a certain bit from controller data when given which byte and bit it is on
-#define DS4_EXTRACT_BTN_STATE(data_p, bit_NUM, byte_NUM)\
-        (*(((char *)&data_p) + byte_NUM) << bit_NUM) & DS4_BTN_PRESSED
+#define DS4_EXTRACT_BTN_STATE(data, btn_number)                   \
+    (*(((char *)&data) + ds4_button_configs[btn_number].byte_NUM) \
+     << ds4_button_configs[btn_number].bit_NUM) &                 \
+        DS4_BTN_PRESSED
 
 /**
  * @brief Holds the event settings of the button
  */
 typedef struct
 {
-    btn_event_bits_t set_events; ///> Fill this variable with ds4_btn_event_e events that you want to use
+    btn_event_bits_t set_events; ///> Fill this variable with ds4_btn_event_masks_e events that you want to use
     // uint16_t debounce_on_time;
     // uint16_t debounce_off_time;
-    void (*trigger_func)(void *);
+    void (*trigger_func[DS4_NUM_OF_BTN_EVENTS])(void *);
     void *argv; ///> Arguments vector that will be passed to the trigger_func
 } btn_event_settings_s;
 
@@ -46,7 +49,7 @@ static QueueHandle_t queue_handle = NULL;
 static TaskHandle_t task_handle = NULL;
 
 // Private function prototypes
-static void event_checker_task(void *p_parameter);
+static void event_parser_task(void *p_parameter);
 
 // Public functions
 
@@ -81,7 +84,7 @@ ds4_event_handling_init_e ds4_init_buttons_event_handler()
     }
 
     // Create the event handler task
-    if (pdPASS != xTaskCreate(&event_checker_task, "DS4 buttons event handler", 1024 * 3, &queue_handle, 6, &task_handle))
+    if (pdPASS != xTaskCreate(&event_parser_task, "DS4 buttons event handler", 1024 * 3, &queue_handle, 6, &task_handle))
     {
         return DS4_INIT_EVENT_TASK_FAILED;
     }
@@ -90,11 +93,11 @@ ds4_event_handling_init_e ds4_init_buttons_event_handler()
     return DS4_INIT_EVENT_SUCCES;
 }
 
-void ds4SetButtonEvent(btn_e button, const btn_event_bits_t event, void (*trigger_func)(void *), void *argv)
+void ds4SetButtonEvent(btn_e button, const ds4_btn_event_masks_e event, void (*trigger_func)(void *), void *argv)
 {
 
-    buttons[button].event_settings.set_events |= event;
-    buttons[button].event_settings.trigger_func = trigger_func;
+    buttons[button].event_settings.set_events |= DS4_BTN_EVENT_MASK_FROM_EVENT(event);
+    buttons[button].event_settings.trigger_func[event] = trigger_func;
     buttons[button].event_settings.argv = argv;
 
     // Cleanup from before if something in states was left
@@ -103,7 +106,7 @@ void ds4SetButtonEvent(btn_e button, const btn_event_bits_t event, void (*trigge
 
 // Private functions
 
-static void event_checker_task(void *p_parameter)
+static void event_parser_task(void *p_parameter)
 {
     ds4_data_t data;
     uint8_t current_button = 0;
@@ -111,11 +114,20 @@ static void event_checker_task(void *p_parameter)
     {
         if (pdTRUE == xQueueReceive(queue_handle, &data, portMAX_DELAY))
         {
-            for(; current_button < DS4_NUM_OF_BUTTONS; current_button++){
+            for (; current_button < DS4_NUM_OF_BUTTONS; current_button++)
+            {
 
-                if(buttons[current_button].event_settings.set_events != 0){
+                if (buttons[current_button].event_settings.set_events != 0)
+                {
+                    // Get current state
                     buttons[current_button].states.current_state =
-                    DS4_EXTRACT_BTN_STATE(data, ds4_button_configs[current_button].bit_NUM, ds4_button_configs[current_button].byte_NUM);
+                        DS4_EXTRACT_BTN_STATE(data, current_button);
+
+                    // call event generator/handler
+
+                    // Update previous state
+                    buttons[current_button].states.prev_state =
+                        buttons[current_button].states.current_state;
                 }
             }
             current_button = 0;
