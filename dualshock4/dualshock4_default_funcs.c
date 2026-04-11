@@ -2,13 +2,10 @@
 #include "dualshock4_default_funcs.h"
 #include "dualshock4_connection_status_modify.h"
 #include "dualshock4_device_handle.h"
-
-#ifdef CONFIG_DS4_MODE_POLLING
 #include "ds4_polling.h"
-#endif
 
 #ifdef CONFIG_DS4_MODE_EVENT
-#include "ds4_polling.h"
+//#include "ds4_polling.h"
 #endif
 
 
@@ -203,9 +200,7 @@ void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller
     }
     prev = *ctl;
 
-    #ifdef CONFIG_DS4_MODE_POLLING
     ds4_polling_send((ds4_data_t *) &ctl->gamepad);
-    #endif
 
     #ifdef CONFIG_DS4_MODE_EVENT
 

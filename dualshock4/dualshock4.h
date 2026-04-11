@@ -10,10 +10,8 @@
 //
 #endif
 
-#ifdef CONFIG_DS4_MODE_POLLING
 #include "ds4_polling.h"
 #include "ds4_receive_type.h"
-#endif
 
 // Defines
 
@@ -124,9 +122,6 @@ ds4_connection_status_e ds4GetConnectionStatus(void);
 //
 #endif
 
-// When polling mode set in config
-#ifdef CONFIG_DS4_MODE_POLLING
-
 /**
  * @brief Pass the pointer to your ds4_data_t variable that you can use for polling
  *
@@ -135,8 +130,6 @@ ds4_connection_status_e ds4GetConnectionStatus(void);
  * data will continuously be saved into the variable given by the pointer.
  */
 void ds4SetPollingStruct(ds4_data_t *p);
-
-#endif
 
 // void ds4_autoconnect_mode();
 // void ds4_disconnect();
