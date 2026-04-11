@@ -7,7 +7,7 @@ menu "DualShock4 Configuration"
     config DS4_MODE_EVENT
         bool "Event-based mode"
 
-    config DS4_MODE_POLLING
+    config DS4_MODE_ONLY_POLLING
         bool "Just polling"
 
     endchoice

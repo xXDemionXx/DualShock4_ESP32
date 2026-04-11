@@ -7,7 +7,7 @@
 #include "dualshock4_task_commands.h"
 
 #ifdef CONFIG_DS4_MODE_EVENT
-//
+#include "btn_events.h"
 #endif
 
 #include "ds4_polling.h"
@@ -118,9 +118,9 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
 ds4_connection_status_e ds4GetConnectionStatus(void);
 
 // When event mode set in config
-#ifdef CONFIG_DS4_MODE_EVENT
-//
-#endif
+// #ifdef CONFIG_DS4_MODE_EVENT
+// void ds4SetButtonEvent(btn_e button, const btn_event_bits_t event, void (*trigger_func)(void *), void *argv)
+// #endif
 
 /**
  * @brief Pass the pointer to your ds4_data_t variable that you can use for polling
