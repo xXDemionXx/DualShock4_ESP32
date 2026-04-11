@@ -2,6 +2,7 @@
 #define BTN_EVENTS_H
 
 #include "btns.h"
+#include <stdint.h>
 
 /**
  * @brief Enum that holds the bit positions of each event type in the buttons set events.

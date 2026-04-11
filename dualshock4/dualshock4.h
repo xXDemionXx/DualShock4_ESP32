@@ -118,9 +118,19 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
 ds4_connection_status_e ds4GetConnectionStatus(void);
 
 // When event mode set in config
-// #ifdef CONFIG_DS4_MODE_EVENT
-// void ds4SetButtonEvent(btn_e button, const btn_event_bits_t event, void (*trigger_func)(void *), void *argv)
-// #endif
+#ifdef CONFIG_DS4_MODE_EVENT
+/**
+ * @brief Use this function to register a button event
+ *
+ * Allows you to register an event, set the function that the evnt will call and to give it
+ * a vector of arguments that will be sent to the function
+ *
+ * @param button On which button to register the event
+ * @param event Event type that will trigger the function
+ * @param argv vector of arguments that will be sent to the triggered function
+ */
+void ds4SetButtonEvent(btn_e button, const btn_event_bits_t event, void (*trigger_func)(void *), void *argv);
+#endif
 
 /**
  * @brief Pass the pointer to your ds4_data_t variable that you can use for polling

@@ -5,7 +5,7 @@
 #include "ds4_polling.h"
 
 #ifdef CONFIG_DS4_MODE_EVENT
-//#include "ds4_polling.h"
+#include "ds4_event_handling.h"
 #endif
 
 
@@ -203,7 +203,7 @@ void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller
     ds4_polling_send((ds4_data_t *) &ctl->gamepad);
 
     #ifdef CONFIG_DS4_MODE_EVENT
-
+    ds4_send_data_to_event_handler((ds4_data_t *) &ctl->gamepad);
     #endif
 }
 

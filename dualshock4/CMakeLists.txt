@@ -16,7 +16,9 @@ set(includes
         )
 
 if(CONFIG_DS4_MODE_EVENT)
-    list(APPEND srcs "receive/event_driven/events.c")
+    list(APPEND srcs    "receive/event_driven/ds4_event_handling.c"
+                        "receive/event_driven/btn_events.c"
+                        )
     list(APPEND includes "receive/event_driven")
 endif()
 
