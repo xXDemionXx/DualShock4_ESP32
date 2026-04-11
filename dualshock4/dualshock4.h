@@ -8,6 +8,7 @@
 
 #ifdef CONFIG_DS4_MODE_EVENT
 #include "btn_events.h"
+#include "ds4_event_handling_init.h"
 #endif
 
 #include "ds4_polling.h"
@@ -26,6 +27,7 @@ typedef enum
     DS4_INIT_BTSTACK_INIT_FAILED,
     DS4_INIT_BLUEPAD_INIT_FAILED,
     DS4_INIT_COMMAND_TASK_FAILED,
+    DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_FAILED,
     DS4_INIT_FAILED
 } ds4_init_e;
 

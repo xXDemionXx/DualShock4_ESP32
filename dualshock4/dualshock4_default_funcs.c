@@ -8,7 +8,6 @@
 #include "ds4_event_handling.h"
 #endif
 
-
 // Function prototypes
 // static void trigger_event_on_gamepad(uni_hid_device_t* d); Unimplemented yet
 platform_instance_t *default_get_ds4_platform_instance(uni_hid_device_t *d);
@@ -104,6 +103,10 @@ uni_error_t default_ds4_platform_on_device_discovered(bd_addr_t addr, const char
 void default_ds4_platform_on_device_connected(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_CONNECTED);
+#ifdef CONFIG_DS4_MODE_EVENT
+    ds4_resume_buttons_event_handler();
+#endif
+
     logi(DUALSHOCK4_DEFAULT_NAME ": device connected: %p\n", d);
 }
 
@@ -119,6 +122,9 @@ void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
     set_ds4_connection_status(DS4_DISCONNECTED);
     // Erase the handle of the device
     ds4_pass_device_handle(NULL);
+#ifdef CONFIG_DS4_MODE_EVENT
+    ds4_resume_buttons_event_handler();
+#endif
 
     logi(DUALSHOCK4_DEFAULT_NAME ": device disconnected: %p\n", d);
 }
@@ -200,11 +206,11 @@ void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller
     }
     prev = *ctl;
 
-    ds4_polling_send((ds4_data_t *) &ctl->gamepad);
+    ds4_polling_send((ds4_data_t *)&ctl->gamepad);
 
-    #ifdef CONFIG_DS4_MODE_EVENT
-    ds4_send_data_to_event_handler((ds4_data_t *) &ctl->gamepad);
-    #endif
+#ifdef CONFIG_DS4_MODE_EVENT
+    ds4_send_data_to_event_handler((ds4_data_t *)&ctl->gamepad);
+#endif
 }
 
 /**

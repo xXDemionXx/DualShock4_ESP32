@@ -54,8 +54,12 @@ ds4_init_e ds4_init(void)
     else
         commands_queue_handle = command_task_init_return.queue_handle;
 
-    // ds4_command_task_init_error_e ds4_commaand_task_init_error;
-    //  ds4_commaand_task_init_error = ds4_commaand_task_init(commands_queue_handle)
+#ifdef CONFIG_DS4_MODE_EVENT
+    ds4_event_handling_init_e buttons_event_handler_init_error;
+    buttons_event_handler_init_error = ds4_init_buttons_event_handler();
+    if(buttons_event_handler_init_error != DS4_INIT_EVENT_SUCCES)
+        return DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_FAILED;
+#endif
 
     return DS4_INIT_SUCCES;
 }
