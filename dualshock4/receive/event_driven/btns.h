@@ -22,4 +22,12 @@ typedef enum{
     DS4_NUM_OF_BUTTONS
 } btn_e;
 
+/**
+ * @brief This enum connects the data representation and the physical truth
+ */
+typedef enum{
+    DS4_BTN_PRESSED = 0,
+    DS4_BTN_RELEASED = 1
+} ds4_btn_position_e;
+
 #endif  // BTN_EVENT_STRUCT_H
