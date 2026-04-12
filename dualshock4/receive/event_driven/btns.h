@@ -1,7 +1,8 @@
 #ifndef BTNS_H
 #define BTNS_H
 
-typedef enum{
+typedef enum
+{
     X_BTN,
     CIRCLE_BTN,
     SQUARE_BTN,
@@ -25,9 +26,10 @@ typedef enum{
 /**
  * @brief This enum connects the data representation and the physical truth
  */
-typedef enum{
-    DS4_BTN_PRESSED = 0,
-    DS4_BTN_RELEASED = 1
+typedef enum
+{
+    DS4_BTN_STATE_PRESSED = 0,
+    DS4_BTN_STATE_RELEASED = 1
 } ds4_btn_position_e;
 
-#endif  // BTN_EVENT_STRUCT_H
+#endif // BTN_EVENT_STRUCT_H

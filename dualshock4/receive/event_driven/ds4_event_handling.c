@@ -5,6 +5,7 @@
 #include "ds4_event_handling_init.h"
 #include "ds4_btn_config.h"
 #include "btn_events.h"
+#include "event_check_funcs.h"
 #include "stdint.h"
 #include <string.h>
 
@@ -12,7 +13,7 @@
 #define DS4_EXTRACT_BTN_STATE(data, btn_number)                   \
     (*(((char *)&data) + ds4_button_configs[btn_number].byte_NUM) \
      << ds4_button_configs[btn_number].bit_NUM) &                 \
-        DS4_BTN_PRESSED
+        DS4_BTN_STATE_PRESSED
 
 /**
  * @brief Holds the event settings of the button
@@ -116,7 +117,7 @@ static void event_parser_task(void *p_parameter)
         {
             for (; current_button < DS4_NUM_OF_BUTTONS; current_button++)
             {
-
+                // Only check buttons that have events set on them
                 if (buttons[current_button].event_settings.set_events != 0)
                 {
                     // Get current state
