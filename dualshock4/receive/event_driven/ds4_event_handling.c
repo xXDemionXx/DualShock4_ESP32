@@ -1,19 +1,12 @@
 #include "btn_events.h"
 #include "ds4_event_handling.h"
-#include "freertos/queue.h"
 #include "ds4_receive_type.h"
 #include "ds4_event_handling_init.h"
 #include "ds4_btn_config.h"
 #include "btn_events.h"
-#include "event_check_funcs.h"
-#include "stdint.h"
+#include "freertos/queue.h"
+#include <stdint.h>
 #include <string.h>
-
-// Helper macro that extracts a certain bit from controller data when given which byte and bit it is on
-#define DS4_EXTRACT_BTN_STATE(data, btn_number)                   \
-    (*(((char *)&data) + ds4_button_configs[btn_number].byte_NUM) \
-     << ds4_button_configs[btn_number].bit_NUM) &                 \
-        DS4_BTN_STATE_PRESSED
 
 /**
  * @brief Holds the event settings of the button
@@ -44,6 +37,7 @@ typedef struct
     btn_event_settings_s event_settings;
 } btn_t;
 
+
 // Private variables
 static btn_t buttons[DS4_NUM_OF_BUTTONS];
 static QueueHandle_t queue_handle = NULL;
@@ -51,6 +45,10 @@ static TaskHandle_t task_handle = NULL;
 
 // Private function prototypes
 static void event_parser_task(void *p_parameter);
+static void event_checker(btn_t *btn);
+static inline ds4_btn_event_e event_check_btn_press(uint8_t state, uint8_t prev_state);
+static inline ds4_btn_event_e event_check_btn_release(uint8_t state, uint8_t prev_state);
+static inline void trigger_event_function(uint8_t found_event, btn_event_settings_s *settings);
 
 // Public functions
 
@@ -94,7 +92,7 @@ ds4_event_handling_init_e ds4_init_buttons_event_handler()
     return DS4_INIT_EVENT_SUCCES;
 }
 
-void ds4SetButtonEvent(btn_e button, const ds4_btn_event_masks_e event, void (*trigger_func)(void *), void *argv)
+void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger_func)(void *), void *argv)
 {
 
     buttons[button].event_settings.set_events |= DS4_BTN_EVENT_MASK_FROM_EVENT(event);
@@ -124,7 +122,8 @@ static void event_parser_task(void *p_parameter)
                     buttons[current_button].states.current_state =
                         DS4_EXTRACT_BTN_STATE(data, current_button);
 
-                    // call event generator/handler
+                    // Call event checker
+                    event_checker(&buttons[current_button]);
 
                     // Update previous state
                     buttons[current_button].states.prev_state =
@@ -134,4 +133,49 @@ static void event_parser_task(void *p_parameter)
             current_button = 0;
         }
     }
+}
+
+void event_checker(btn_t *btn)
+{
+    btn_event_bits_t found_event_MASK;
+    uint8_t found_event = DS4_BTN_EVENT_NO_EVENT;
+    for (uint8_t i = 0; i < DS4_NUM_OF_BTN_EVENTS; i++)
+    {
+        found_event_MASK = DS4_BTN_EVENT_MASK_FROM_EVENT(i) & btn->event_settings.set_events;
+        switch (found_event_MASK)
+        {
+        case (DS4_BTN_PRESS_MASK):
+            found_event = event_check_btn_press(btn->states.current_state, btn->states.prev_state);
+            break;
+        case (DS4_BTN_RELEASE_MASK):
+            found_event = event_check_btn_press(btn->states.current_state, btn->states.prev_state);
+            break;
+        default:
+            // Do nothing if that event isn't set for monitoring
+            break;
+        }
+        if(found_event != DS4_BTN_EVENT_NO_EVENT)
+            trigger_event_function(found_event, &btn->event_settings);
+    }
+}
+
+static inline void trigger_event_function(uint8_t found_event, btn_event_settings_s *settings)
+{
+    // Call the function indexed by the event type in the settings
+    settings->trigger_func[found_event](settings->argv);
+}
+
+static inline ds4_btn_event_e event_check_btn_press(uint8_t state, uint8_t prev_state)
+{
+    if (prev_state == DS4_BTN_STATE_RELEASED && state == DS4_BTN_STATE_PRESSED)
+        return DS4_BTN_EVENT_PRESS;
+    else
+        return DS4_BTN_EVENT_NO_EVENT;
+}
+
+inline static ds4_btn_event_e event_check_btn_release(uint8_t state, uint8_t prev_state){
+    if (prev_state == DS4_BTN_STATE_PRESSED && state == DS4_BTN_STATE_RELEASED)
+        return DS4_BTN_EVENT_RELEASE;
+    else
+        return DS4_BTN_EVENT_NO_EVENT;
 }

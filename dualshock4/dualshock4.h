@@ -131,7 +131,7 @@ ds4_connection_status_e ds4GetConnectionStatus(void);
  * @param event Event type that will trigger the function
  * @param argv vector of arguments that will be sent to the triggered function
  */
-void ds4SetButtonEvent(btn_e button, const btn_event_bits_t event, void (*trigger_func)(void *), void *argv);
+void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger_func)(void *), void *argv);
 #endif
 
 /**

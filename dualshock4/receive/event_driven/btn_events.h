@@ -31,8 +31,8 @@ typedef enum{
     DS4_BTN_NO_EVENT_MASK   = 0x0,
     DS4_BTN_PRESS_MASK      = 0x1,
     DS4_BTN_RELEASE_MASK    = 0x2,
-    DS4_BTN_HOLD_MASK       = 0x4,
-
+    // DS4_BTN_HOLD_MASK       = 0x4,   // Might implement in the future
+    //
     DS4_POSSIBLE_EVENT_MASKS // Which values bellow contain event bits
 } ds4_btn_event_masks_e;
 
@@ -44,5 +44,5 @@ typedef uint16_t btn_event_bits_t;
 typedef uint32_t btn_event_bits_t;
 #endif
 
-void ds4SetButtonEvent(btn_e button, const ds4_btn_event_masks_e event, void (*trigger_func)(void *), void *argv);
+void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger_func)(void *), void *argv);
 #endif  // BTN_EVENTS_H

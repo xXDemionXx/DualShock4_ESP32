@@ -6,8 +6,8 @@
 
 typedef struct
 {
-    const uint8_t byte_NUM;    ///> Controller sends an array of bytes containing all the data, on which byte is the state
-    const uint8_t bit_NUM;     ///> Controller sends an array of bytes containing all the data, on which bit is the state
+    const uint8_t byte_NUM; ///> Controller sends an array of bytes containing all the data, on which byte is the state
+    const uint8_t bit_NUM;  ///> Controller sends an array of bytes containing all the data, on which bit is the state
 } ds4_button_config_t;
 
 // Numbering starts from 0!!!
@@ -31,7 +31,7 @@ enum
     DS4_BIT_IN_DATA_PS_BTN = 240,
 };
 
-// Helper macros
+// Helper macros for filling the ds4_button_configs struct
 #define DS4_NUM_OF_BIT_IN_DATA_TO_BYTE_NUM(x) x / 8
 #define DS4_NUM_OF_BIT_IN_DATA_TO_BIT_NUM(x) x % 8
 
@@ -82,5 +82,11 @@ const ds4_button_config_t ds4_button_configs[DS4_NUM_OF_BUTTONS] = {
     [PS_BTN] = {.byte_NUM = DS4_NUM_OF_BIT_IN_DATA_TO_BYTE_NUM(DS4_BIT_IN_DATA_PS_BTN),
                 .bit_NUM = DS4_NUM_OF_BIT_IN_DATA_TO_BIT_NUM(DS4_BIT_IN_DATA_PS_BTN)},
 };
+
+// Helper macro that extracts a certain bit from controller data when given which byte and bit it is on
+#define DS4_EXTRACT_BTN_STATE(data, btn_number)                   \
+    (*(((char *)&data) + ds4_button_configs[btn_number].byte_NUM) \
+     << ds4_button_configs[btn_number].bit_NUM) &                 \
+        DS4_BTN_STATE_PRESSED
 
 #endif // BTN_DATA_MASKS_H
