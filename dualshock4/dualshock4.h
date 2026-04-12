@@ -127,6 +127,7 @@ ds4_connection_status_e ds4GetConnectionStatus(void);
  *
  * @param button On which button to register the event
  * @param event Event type that will trigger the function
+ * @param trigger_func Pointer to a function that will be called when the event happens
  * @param argv vector of arguments that will be sent to the triggered function
  */
 void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger_func)(void *), void *argv);
@@ -141,10 +142,7 @@ void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger
  */
 void ds4SetPollingStruct(ds4_data_t *p);
 
-// void ds4_autoconnect_mode();
-// void ds4_disconnect();
-// ds4_connection_error_e ds4_search_and_connect(void); // Connect to controller, report error
-// ds4_data_t ds4_recieve_data(void);
-// ds4_connection_error_e ds4_disconnect(void);
+// void ds4Autoconnect();
+// void ds4Disconnect();
 
 #endif // DUALSHOCK4_H
