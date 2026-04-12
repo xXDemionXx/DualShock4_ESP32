@@ -86,7 +86,7 @@ const ds4_button_config_t ds4_button_configs[DS4_NUM_OF_BUTTONS] = {
 // Helper macro that extracts a certain bit from controller data when given which byte and bit it is on
 #define DS4_EXTRACT_BTN_STATE(data, btn_number)                   \
     (*(((char *)&data) + ds4_button_configs[btn_number].byte_NUM) \
-     << ds4_button_configs[btn_number].bit_NUM) &                 \
+     >> ds4_button_configs[btn_number].bit_NUM) &                 \
         DS4_BTN_STATE_PRESSED
 
 #endif // BTN_DATA_MASKS_H

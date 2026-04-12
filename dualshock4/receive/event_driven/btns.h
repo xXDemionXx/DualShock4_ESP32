@@ -28,8 +28,8 @@ typedef enum
  */
 typedef enum
 {
-    DS4_BTN_STATE_PRESSED = 0,
-    DS4_BTN_STATE_RELEASED = 1
+    DS4_BTN_STATE_PRESSED = 1,
+    DS4_BTN_STATE_RELEASED = 0
 } ds4_btn_position_e;
 
 #endif // BTN_EVENT_STRUCT_H
