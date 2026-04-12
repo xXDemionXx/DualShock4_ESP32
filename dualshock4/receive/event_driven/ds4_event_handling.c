@@ -1,5 +1,7 @@
-#include "btn_events.h"
 #include "ds4_event_handling.h"
+#include "ds4_btn_event_handling_settings.h"
+#include "btns.h"
+#include "btn_events.h"
 #include "ds4_receive_type.h"
 #include "ds4_event_handling_init.h"
 #include "ds4_btn_config.h"
@@ -7,6 +9,9 @@
 #include "freertos/queue.h"
 #include <stdint.h>
 #include <string.h>
+
+// Helper
+#define DS4_BTN_EVENT_MASK_FROM_EVENT(event) (1 << event)
 
 /**
  * @brief Holds the event settings of the button
@@ -37,14 +42,13 @@ typedef struct
     btn_event_settings_s event_settings;
 } btn_t;
 
-
 // Private variables
 static btn_t buttons[DS4_NUM_OF_BUTTONS];
 static QueueHandle_t queue_handle = NULL;
 static TaskHandle_t task_handle = NULL;
 
 // Private function prototypes
-static void event_parser_task(void *p_parameter);
+static void event_handler_task(void *p_parameter);
 static void event_checker(btn_t *btn);
 static inline ds4_btn_event_e event_check_btn_press(uint8_t state, uint8_t prev_state);
 static inline ds4_btn_event_e event_check_btn_release(uint8_t state, uint8_t prev_state);
@@ -83,7 +87,7 @@ ds4_event_handling_init_e ds4_init_buttons_event_handler()
     }
 
     // Create the event handler task
-    if (pdPASS != xTaskCreate(&event_parser_task, "DS4 buttons event handler", 1024 * 3, &queue_handle, 6, &task_handle))
+    if (pdPASS != xTaskCreate(&event_handler_task, DS4_BTN_EVENT_TASK_NAME, NUM_TO_KB(DS4_BTN_EVENT_TASK_SIZE), &queue_handle, DS4_BTN_EVENT_TASK_PRIORITY, &task_handle))
     {
         return DS4_INIT_EVENT_TASK_FAILED;
     }
@@ -105,7 +109,10 @@ void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger
 
 // Private functions
 
-static void event_parser_task(void *p_parameter)
+/**
+ * @brief When new data is available parse it and call event_checker() on buttons that monitor events
+ */
+static void event_handler_task(void *p_parameter)
 {
     ds4_data_t data;
     uint8_t current_button = 0;
@@ -135,6 +142,11 @@ static void event_parser_task(void *p_parameter)
     }
 }
 
+/**
+ * @brief Check all the events on the button set for monitoring, calls the trigger function if event found.
+ *
+ * Needs further research
+ */
 void event_checker(btn_t *btn)
 {
     btn_event_bits_t found_event_MASK;
@@ -154,7 +166,7 @@ void event_checker(btn_t *btn)
             // Do nothing if that event isn't set for monitoring
             break;
         }
-        if(found_event != DS4_BTN_EVENT_NO_EVENT)
+        if (found_event != DS4_BTN_EVENT_NO_EVENT)
             trigger_event_function(found_event, &btn->event_settings);
     }
 }
@@ -173,7 +185,8 @@ static inline ds4_btn_event_e event_check_btn_press(uint8_t state, uint8_t prev_
         return DS4_BTN_EVENT_NO_EVENT;
 }
 
-inline static ds4_btn_event_e event_check_btn_release(uint8_t state, uint8_t prev_state){
+inline static ds4_btn_event_e event_check_btn_release(uint8_t state, uint8_t prev_state)
+{
     if (prev_state == DS4_BTN_STATE_PRESSED && state == DS4_BTN_STATE_RELEASED)
         return DS4_BTN_EVENT_RELEASE;
     else

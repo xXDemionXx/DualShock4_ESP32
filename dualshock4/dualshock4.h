@@ -4,15 +4,13 @@
 #define DUALSHOCK4_H
 
 #include "dualshock4_initializer.h"
-#include "dualshock4_task_commands.h"
+#include "ds4_polling.h"
+#include "ds4_receive_type.h"
 
 #ifdef CONFIG_DS4_MODE_EVENT
 #include "btn_events.h"
 #include "ds4_event_handling_init.h"
 #endif
-
-#include "ds4_polling.h"
-#include "ds4_receive_type.h"
 
 // Defines
 

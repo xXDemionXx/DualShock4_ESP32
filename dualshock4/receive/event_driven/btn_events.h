@@ -4,9 +4,6 @@
 #include "btns.h"
 #include <stdint.h>
 
-// Helper 
-#define DS4_BTN_EVENT_MASK_FROM_EVENT(event)    (1 << event)
-
 /**
  * @brief Enum that holds all the possible event types for a button
  * 
