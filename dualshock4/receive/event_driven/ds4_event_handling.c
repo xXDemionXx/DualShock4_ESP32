@@ -160,7 +160,7 @@ void event_checker(btn_t *btn)
             found_event = event_check_btn_press(btn->states.current_state, btn->states.prev_state);
             break;
         case (DS4_BTN_RELEASE_MASK):
-            found_event = event_check_btn_press(btn->states.current_state, btn->states.prev_state);
+            found_event = event_check_btn_release(btn->states.current_state, btn->states.prev_state);
             break;
         default:
             // Do nothing if that event isn't set for monitoring
