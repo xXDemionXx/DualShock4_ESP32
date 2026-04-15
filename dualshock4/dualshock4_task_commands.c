@@ -1,12 +1,15 @@
 #include "dualshock4_task_commands.h"
 #include "dualshock4_device_handle.h"
 
+#include "hci.h"
+#include "esp_log.h"
+
 // Private variables
 static QueueHandle_t commands_queue_handle = NULL;
 
 // Private function prototypes
 static void ds4_commands_task(void *p_parameter);
-static void change_lightbar(ds4_command_change_lightbar command, ds4_device_handle d);
+static void change_lightbar(ds4_command_change_lightbar command, uni_hid_device_t *d);
 static void rumble(ds4_command_rumble command, ds4_device_handle d);
 static void test_write(ds4_command_test_write);
 
@@ -58,31 +61,45 @@ static void ds4_commands_task(void *p_parameter)
     {
         if (pdTRUE == xQueueReceive(commands_queue_handle, &command_packet, portMAX_DELAY))
         {
-            switch (command_packet.command_indicator)
-            {
-            case (DS4_COMMAND_TYPE_LIGHTBAR):
-                change_lightbar(command_packet.data.lightbar_command, command_packet.device);
-                break;
-            case (DS4_COMMAND_TYPE_RUMBLE):
-                rumble(command_packet.data.rumble_command, command_packet.device);
-                break;
-            case (DS4_COMMAND_TYPE_TEST_WRITE):
-                test_write(command_packet.data.test_write_command);
-                break;
-            default:
-                ESP_LOGI(TAG, "Unknown command for DS4");
+            if(hci_is_packet_buffer_reserved() == false){
+                switch (command_packet.command_indicator)
+                {
+                case (DS4_COMMAND_TYPE_LIGHTBAR):
+                    change_lightbar(command_packet.data.lightbar_command, command_packet.device);
+                    break;
+                case (DS4_COMMAND_TYPE_RUMBLE):
+                    rumble(command_packet.data.rumble_command, command_packet.device);
+                    break;
+                case (DS4_COMMAND_TYPE_TEST_WRITE):
+                    test_write(command_packet.data.test_write_command);
+                    break;
+                default:
+                    ESP_LOGI(TAG, "Unknown command for DS4");
+                }
+            }else{
+                static uint16_t i=0;
+                i++;
+                ESP_LOGW(TAG, "HCI buffer full occurance num: %d", i);
             }
         }
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(20 / portTICK_PERIOD_MS);
     }
 }
 
 // Possible commands
 
-static void change_lightbar(ds4_command_change_lightbar command, ds4_device_handle d)
+// static void change_lightbar(ds4_command_change_lightbar command, ds4_device_handle d)
+// {
+//     ESP_LOGI(TAG, "Change lightbar");
+//     if(((uni_hid_device_t*)d)->report_parser.set_lightbar_color != NULL)
+//     ((uni_hid_device_t*)d)->report_parser.set_lightbar_color((uni_hid_device_t*)d, command.R, command.G, command.B);
+// }
+
+static void change_lightbar(ds4_command_change_lightbar command, uni_hid_device_t *d)
 {
-    ESP_LOGI(TAG, "Change lightbar");
-    ((uni_hid_device_t*)d)->report_parser.set_lightbar_color((uni_hid_device_t*)d, command.R, command.G, command.B);
+    //ESP_LOGI(TAG, "Change lightbar");
+    if(((uni_hid_device_t*)d)->report_parser.set_lightbar_color != NULL)
+        ((uni_hid_device_t*)d)->report_parser.set_lightbar_color(d, command.R, command.G, command.B);
 }
 
 static void rumble(ds4_command_rumble command, ds4_device_handle d)

@@ -12,8 +12,3 @@ void ds4_pass_device_handle(ds4_device_handle device)
 {
     *ds4_p = device;
 }
-
-ds4_device_handle ds4_get_device_handle(void)
-{
-    return *ds4_p;
-}
