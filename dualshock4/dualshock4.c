@@ -1,18 +1,22 @@
 #include "dualshock4.h"
 
 #include "dualshock4_initializer.h"
-#include "dualshock4_task_commands.h"
+// #include "dualshock4_task_commands.h"
 #include "dualshock4_connection_status_modify.h"
 #include "dualshock4_device_handle.h"
+
+#include "controller_commands.h"
+#include "btstack_defines.h"
 
 // Local defines
 #define DS4_COMMAND_TASK_SEND_TIME 100 // In ms
 //
 
-// Variables
-static QueueHandle_t commands_queue_handle = NULL;
-// static QueueHandle_t receive_queue_handle = NULL;
+// Private variables
 static ds4_device_handle ds4 = NULL;
+static btstack_context_callback_registration_t callback_registration;
+
+static ds4_command_t command;
 
 /**
  * @brief Sets up everything needed for ds4 before we can connect.
@@ -47,41 +51,14 @@ ds4_init_e ds4_init(void)
     // Needed for global connection status checking
     ds4_init_connection_status();
 
-    ds4_command_task_init_return_t command_task_init_return;
-    command_task_init_return = ds4_init_commands_task();
-    if (command_task_init_return.error_code != DS4_COMMAND_TASK_INIT_SUCCES)
-        return DS4_INIT_COMMAND_TASK_FAILED;
-    else
-        commands_queue_handle = command_task_init_return.queue_handle;
-
 #ifdef CONFIG_DS4_MODE_EVENT
     ds4_event_handling_init_e buttons_event_handler_init_error;
     buttons_event_handler_init_error = ds4_init_buttons_event_handler();
-    if(buttons_event_handler_init_error != DS4_INIT_EVENT_SUCCES)
+    if (buttons_event_handler_init_error != DS4_INIT_EVENT_SUCCES)
         return DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_FAILED;
 #endif
 
     return DS4_INIT_SUCCES;
-}
-
-ds4_command_send_e ds4SendMessage(const char *message)
-{
-    // Controller not connected or no device handle
-    if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
-        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
-
-    ds4_command_s command;
-    command.command_indicator = DS4_COMMAND_TYPE_TEST_WRITE;
-    command.device = ds4; // Pass the device handle
-    strcpy((char *)&command.data.test_write_command.string, message);
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
-    {
-        return DS4_COMMAND_SEND_SUCCES;
-    }
-    else
-    {
-        return DS4_COMMAND_SEND_FAIL_QUEUE;
-    }
 }
 
 ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
@@ -90,20 +67,16 @@ ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
-    ds4_command_s command;
-    command.command_indicator = DS4_COMMAND_TYPE_LIGHTBAR;
-    command.device = ds4; // Pass the device handle
-    command.data.lightbar_command.R = R;
-    command.data.lightbar_command.G = G;
-    command.data.lightbar_command.B = B;
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
-    {
-        return DS4_COMMAND_SEND_SUCCES;
-    }
-    else
-    {
-        return DS4_COMMAND_SEND_FAIL_QUEUE;
-    }
+    command.device = ds4;
+    command.data.lightbar.R = R;
+    command.data.lightbar.G = G;
+    command.data.lightbar.B = B;
+
+    callback_registration.callback = &ds4_lightbar_callback;
+    callback_registration.context = (void *)(&command);
+    btstack_run_loop_execute_on_main_thread(&callback_registration);
+
+    return DS4_COMMAND_SEND_SUCCES;
 }
 
 ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
@@ -112,21 +85,18 @@ ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t 
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
-    ds4_command_s command;
-    command.command_indicator = DS4_COMMAND_TYPE_RUMBLE;
-    command.device = ds4; // Pass the device handle
-    command.data.rumble_command.magnitude_weak = magnitude;
-    command.data.rumble_command.magnitude_strong = magnitude;
-    command.data.rumble_command.duration = duration;
-    command.data.rumble_command.start_delay = start_delay;
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
-    {
-        return DS4_COMMAND_SEND_SUCCES;
-    }
-    else
-    {
-        return DS4_COMMAND_SEND_FAIL_QUEUE;
-    }
+    ds4_command_t command = {
+        .device = ds4,
+        .data.rumble.magnitude_weak = magnitude,
+        .data.rumble.magnitude_strong = magnitude,
+        .data.rumble.duration = duration,
+        .data.rumble.start_delay = start_delay};
+
+    callback_registration.callback = &ds4_rumble_callback;
+    callback_registration.context = (void *)(&command);
+    btstack_run_loop_execute_on_main_thread(&callback_registration);
+
+    return DS4_COMMAND_SEND_SUCCES;
 }
 
 ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
@@ -135,21 +105,18 @@ ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint1
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
-    ds4_command_s command;
-    command.command_indicator = DS4_COMMAND_TYPE_RUMBLE;
-    command.device = ds4; // Pass the device handle
-    command.data.rumble_command.magnitude_weak = magnitude;
-    command.data.rumble_command.magnitude_strong = 0;
-    command.data.rumble_command.duration = duration;
-    command.data.rumble_command.start_delay = start_delay;
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
-    {
-        return DS4_COMMAND_SEND_SUCCES;
-    }
-    else
-    {
-        return DS4_COMMAND_SEND_FAIL_QUEUE;
-    }
+    ds4_command_t command = {
+        .device = ds4,
+        .data.rumble.magnitude_weak = magnitude,
+        .data.rumble.magnitude_strong = 0,
+        .data.rumble.duration = duration,
+        .data.rumble.start_delay = start_delay};
+
+    callback_registration.callback = &ds4_rumble_callback;
+    callback_registration.context = (void *)(&command);
+    btstack_run_loop_execute_on_main_thread(&callback_registration);
+
+    return DS4_COMMAND_SEND_SUCCES;
 }
 
 ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
@@ -158,21 +125,18 @@ ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uin
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
-    ds4_command_s command;
-    command.command_indicator = DS4_COMMAND_TYPE_RUMBLE;
-    command.device = ds4; // Pass the device handle
-    command.data.rumble_command.magnitude_weak = 0;
-    command.data.rumble_command.magnitude_strong = magnitude;
-    command.data.rumble_command.duration = duration;
-    command.data.rumble_command.start_delay = start_delay;
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
-    {
-        return DS4_COMMAND_SEND_SUCCES;
-    }
-    else
-    {
-        return DS4_COMMAND_SEND_FAIL_QUEUE;
-    }
+    ds4_command_t command = {
+        .device = ds4,
+        .data.rumble.magnitude_weak = 0,
+        .data.rumble.magnitude_strong = magnitude,
+        .data.rumble.duration = duration,
+        .data.rumble.start_delay = start_delay};
+
+    callback_registration.callback = &ds4_rumble_callback;
+    callback_registration.context = (void *)(&command);
+    btstack_run_loop_execute_on_main_thread(&callback_registration);
+
+    return DS4_COMMAND_SEND_SUCCES;
 }
 
 ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay)
@@ -181,22 +145,21 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
-    ds4_command_s command;
-    command.command_indicator = DS4_COMMAND_TYPE_RUMBLE;
-    command.device = ds4; // Pass the device handle
-    command.data.rumble_command.magnitude_weak = magnitude_weak;
-    command.data.rumble_command.magnitude_strong = magnitude_strong;
-    command.data.rumble_command.duration = duration;
-    command.data.rumble_command.start_delay = start_delay;
-    if (pdTRUE == xQueueSend(commands_queue_handle, &command, pdMS_TO_TICKS(DS4_COMMAND_TASK_SEND_TIME)))
-    {
-        return DS4_COMMAND_SEND_SUCCES;
-    }
-    else
-    {
-        return DS4_COMMAND_SEND_FAIL_QUEUE;
-    }
+    ds4_command_t command = {
+        .device = ds4,
+        .data.rumble.magnitude_weak = magnitude_weak,
+        .data.rumble.magnitude_strong = magnitude_strong,
+        .data.rumble.duration = duration,
+        .data.rumble.start_delay = start_delay};
+
+    callback_registration.callback = &ds4_rumble_callback;
+    callback_registration.context = (void *)(&command);
+    btstack_run_loop_execute_on_main_thread(&callback_registration);
+
+    return DS4_COMMAND_SEND_SUCCES;
 }
+
+// Private functions
 
 void ds4_run_loop(void)
 {

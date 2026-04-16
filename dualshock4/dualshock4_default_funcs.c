@@ -3,7 +3,6 @@
 #include "dualshock4_connection_status_modify.h"
 #include "dualshock4_device_handle.h"
 #include "ds4_polling.h"
-#include "dualshock4_task_commands_control.h"
 
 #ifdef CONFIG_DS4_MODE_EVENT
 #include "ds4_event_handling.h"
@@ -105,7 +104,6 @@ void default_ds4_platform_on_device_connected(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_CONNECTED);
 
-    ds4_resume_command_task();
 #ifdef CONFIG_DS4_MODE_EVENT
     ds4_resume_buttons_event_handler();
 #endif
@@ -125,8 +123,7 @@ void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
     set_ds4_connection_status(DS4_DISCONNECTED);
     // Erase the handle of the device
     ds4_pass_device_handle(NULL);
-
-    ds4_suspend_command_task();
+    
 #ifdef CONFIG_DS4_MODE_EVENT
     ds4_resume_buttons_event_handler();
 #endif

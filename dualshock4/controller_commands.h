@@ -1,0 +1,59 @@
+#ifndef CONTROLLER_COMMANDS_H
+#define CONTROLLER_COMMANDS_H
+
+#include "dualshock4_initializer.h"
+#include <stdint.h>
+
+// Public types
+
+typedef enum{
+    DS4_COMMAND_LIGHTBAR,
+    DS4_COMMAND_RUMBLE,
+    //
+    DS4_NUM_OF_COMMAND_TYPES
+} ds4_command_types_e;
+
+typedef struct
+{
+    uint8_t R;
+    uint8_t G;
+    uint8_t B;
+} ds4_command_lightbar_t;
+
+typedef struct
+{
+    uint8_t magnitude_weak;
+    uint8_t magnitude_strong;
+    uint16_t duration;
+    uint16_t start_delay;
+} ds4_command_rumble_t;
+
+typedef union
+{
+    ds4_command_lightbar_t lightbar;
+    ds4_command_rumble_t rumble;
+} ds4_command_data_t;
+
+typedef struct
+{
+    ds4_device_handle device; ///> Handle of the device to which the command will be sent
+    ds4_command_data_t data;  ///> The payload
+} ds4_command_t;
+
+// Public functions
+
+/**
+ * @brief Set the lightbar (use only as an argument for btstack's callback registration)
+ *
+ * @param p_parameter Pointer to ds4_command_t parameters with ds4_command_lightbar_t data
+ */
+void ds4_lightbar_callback(void *p_parameter);
+
+/**
+ * @brief Set the rumble (use only as an argument for btstack's callback registration)
+ *
+ * @param p_parameter Pointer to ds4_command_t parameters with ds4_command_rumble_t data
+ */
+void ds4_rumble_callback(void *p_parameter);
+
+#endif // CONTROLLER_COMMANDS_H
