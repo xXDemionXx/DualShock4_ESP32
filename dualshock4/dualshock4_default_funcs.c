@@ -103,6 +103,7 @@ uni_error_t default_ds4_platform_on_device_discovered(bd_addr_t addr, const char
 void default_ds4_platform_on_device_connected(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_CONNECTED);
+
 #ifdef CONFIG_DS4_MODE_EVENT
     ds4_resume_buttons_event_handler();
 #endif
@@ -122,6 +123,7 @@ void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
     set_ds4_connection_status(DS4_DISCONNECTED);
     // Erase the handle of the device
     ds4_pass_device_handle(NULL);
+    
 #ifdef CONFIG_DS4_MODE_EVENT
     ds4_resume_buttons_event_handler();
 #endif

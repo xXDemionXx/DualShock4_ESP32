@@ -24,19 +24,20 @@ typedef enum
     DS4_INIT_SUCCES,
     DS4_INIT_BTSTACK_INIT_FAILED,
     DS4_INIT_BLUEPAD_INIT_FAILED,
-    DS4_INIT_COMMAND_TASK_FAILED,
     DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_FAILED,
     DS4_INIT_FAILED
 } ds4_init_e;
 
 typedef enum
 {
+    DS4_COMMAND_SEND_SUCCES,
     DS4_COMMAND_SEND_FAIL_NO_CONTROLLER,
-    DS4_COMMAND_SEND_FAIL_QUEUE,
-    DS4_COMMAND_SEND_SUCCES
+    DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT
 } ds4_command_send_e;
 
 // Callable functions
+
+void ds4_run_loop(void);
 
 /**
  * @brief Sets up everything needed for ds4 before we can connect.
@@ -44,15 +45,6 @@ typedef enum
  * @return With what state did the initialization exit.
  */
 ds4_init_e ds4_init(void);
-
-void ds4_run_loop(void);
-
-/**
- * @brief Sends a string message to commands task
- *
- * @return Error code
- */
-ds4_command_send_e ds4SendMessage(const char *message);
 
 /**
  * @brief Set the RGB value of the lightbar
