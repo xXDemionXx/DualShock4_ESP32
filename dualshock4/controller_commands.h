@@ -6,12 +6,20 @@
 
 // Public types
 
-typedef enum{
+typedef enum
+{
     DS4_COMMAND_LIGHTBAR,
     DS4_COMMAND_RUMBLE,
     //
     DS4_NUM_OF_COMMAND_TYPES
 } ds4_command_types_e;
+
+typedef enum
+{
+    DS4_COMMAND_STATUS_AVAILABLE = 0,
+    DS4_COMMAND_STATUS_UNAVAILABLE,
+    DS4_COMMAND_STATUS_FAILED_SEND
+} ds4_command_execution_status;
 
 typedef struct
 {
@@ -36,8 +44,9 @@ typedef union
 
 typedef struct
 {
-    ds4_device_handle device; ///> Handle of the device to which the command will be sent
-    ds4_command_data_t data;  ///> The payload
+    ds4_command_execution_status status; ///>
+    ds4_device_handle device;            ///> Handle of the device to which the command will be sent
+    ds4_command_data_t data;             ///> The payload
 } ds4_command_t;
 
 // Public functions

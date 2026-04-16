@@ -31,7 +31,8 @@ typedef enum
 typedef enum
 {
     DS4_COMMAND_SEND_SUCCES,
-    DS4_COMMAND_SEND_FAIL_NO_CONTROLLER
+    DS4_COMMAND_SEND_FAIL_NO_CONTROLLER,
+    DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT
 } ds4_command_send_e;
 
 // Callable functions

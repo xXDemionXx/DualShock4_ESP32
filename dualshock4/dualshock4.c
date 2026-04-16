@@ -16,7 +16,7 @@
 static ds4_device_handle ds4 = NULL;
 static btstack_context_callback_registration_t callback_registration;
 
-static ds4_command_t command;
+static ds4_command_t commands[DS4_NUM_OF_COMMAND_TYPES] = {0};  // An array that is used for storing data of each command type
 
 /**
  * @brief Sets up everything needed for ds4 before we can connect.
@@ -66,14 +66,19 @@ ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+    
+    // The callback sets the command status to AVAILABLE when it is done sending
+    if(commands[DS4_COMMAND_LIGHTBAR].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
 
-    command.device = ds4;
-    command.data.lightbar.R = R;
-    command.data.lightbar.G = G;
-    command.data.lightbar.B = B;
+    commands[DS4_COMMAND_LIGHTBAR].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
+    commands[DS4_COMMAND_LIGHTBAR].device = ds4;
+    commands[DS4_COMMAND_LIGHTBAR].data.lightbar.R = R;
+    commands[DS4_COMMAND_LIGHTBAR].data.lightbar.G = G;
+    commands[DS4_COMMAND_LIGHTBAR].data.lightbar.B = B;
 
     callback_registration.callback = &ds4_lightbar_callback;
-    callback_registration.context = (void *)(&command);
+    callback_registration.context = (void *)(&commands[DS4_COMMAND_LIGHTBAR]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
     return DS4_COMMAND_SEND_SUCCES;
@@ -84,16 +89,20 @@ ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t 
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+    
+    // The callback sets the command status to AVAILABLE when it is done sending
+    if(commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
 
-    ds4_command_t command = {
-        .device = ds4,
-        .data.rumble.magnitude_weak = magnitude,
-        .data.rumble.magnitude_strong = magnitude,
-        .data.rumble.duration = duration,
-        .data.rumble.start_delay = start_delay};
+    commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
+    commands[DS4_COMMAND_RUMBLE].device = ds4;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.magnitude_weak = magnitude;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.magnitude_strong = magnitude;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.duration = duration;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.start_delay = start_delay;
 
     callback_registration.callback = &ds4_rumble_callback;
-    callback_registration.context = (void *)(&command);
+    callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
     return DS4_COMMAND_SEND_SUCCES;
@@ -105,15 +114,19 @@ ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint1
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
-    ds4_command_t command = {
-        .device = ds4,
-        .data.rumble.magnitude_weak = magnitude,
-        .data.rumble.magnitude_strong = 0,
-        .data.rumble.duration = duration,
-        .data.rumble.start_delay = start_delay};
+    // The callback sets the command status to AVAILABLE when it is done sending
+    if(commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
+
+    commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
+    commands[DS4_COMMAND_RUMBLE].device = ds4;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.magnitude_weak = magnitude;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.magnitude_strong = 0;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.duration = duration;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.start_delay = start_delay;
 
     callback_registration.callback = &ds4_rumble_callback;
-    callback_registration.context = (void *)(&command);
+    callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
     return DS4_COMMAND_SEND_SUCCES;
@@ -125,15 +138,19 @@ ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uin
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
-    ds4_command_t command = {
-        .device = ds4,
-        .data.rumble.magnitude_weak = 0,
-        .data.rumble.magnitude_strong = magnitude,
-        .data.rumble.duration = duration,
-        .data.rumble.start_delay = start_delay};
+    // The callback sets the command status to AVAILABLE when it is done sending
+    if(commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
+
+    commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
+    commands[DS4_COMMAND_RUMBLE].device = ds4;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.magnitude_weak = 0;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.magnitude_strong = magnitude;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.duration = duration;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.start_delay = start_delay;
 
     callback_registration.callback = &ds4_rumble_callback;
-    callback_registration.context = (void *)(&command);
+    callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
     return DS4_COMMAND_SEND_SUCCES;
@@ -145,15 +162,19 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
-    ds4_command_t command = {
-        .device = ds4,
-        .data.rumble.magnitude_weak = magnitude_weak,
-        .data.rumble.magnitude_strong = magnitude_strong,
-        .data.rumble.duration = duration,
-        .data.rumble.start_delay = start_delay};
+    // The callback sets the command status to AVAILABLE when it is done sending
+    if(commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
+
+    commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
+    commands[DS4_COMMAND_RUMBLE].device = ds4;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.magnitude_weak = magnitude_weak;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.magnitude_strong = magnitude_strong;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.duration = duration;
+    commands[DS4_COMMAND_RUMBLE].data.rumble.start_delay = start_delay;
 
     callback_registration.callback = &ds4_rumble_callback;
-    callback_registration.context = (void *)(&command);
+    callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
     return DS4_COMMAND_SEND_SUCCES;
