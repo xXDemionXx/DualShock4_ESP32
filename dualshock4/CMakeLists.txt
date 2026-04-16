@@ -2,18 +2,18 @@ set(srcs
          "dualshock4_initializer.c" 
          "dualshock4.c"
          "dualshock4_default_funcs.c"
-         #"dualshock4_task_commands.c"
          "dualshock4_connection_status.c"
          "dualshock4_connection_status_modify.c"
          "dualshock4_device_handle.c"
-         "controller_commands.c"
          "receive/polling/polling.c"
+         "send/controller_commands.c"
          )
 
 set(includes
          "."
          "receive"
          "receive/polling"
+         "send"
         )
 
 if(CONFIG_DS4_MODE_EVENT)
