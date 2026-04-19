@@ -157,7 +157,7 @@ void ds4Disconnect(void);
  *
  * @param MAC String containing the MAC address (example formating: "40:1B:5F:69:9B:88")
  */
-ds4_set_addr_e ds4SetAddress(const char *MAC);
+ds4_set_addr_e ds4AllowDevice(const char *MAC);
 
 // void ds4Autoconnect();
 

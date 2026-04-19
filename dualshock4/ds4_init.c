@@ -38,6 +38,8 @@ ds4_init_e ds4Init(void)
     // Init Bluepad32
     if(ds4_bluepad32_init() != 0)
         return DS4_INIT_BLUEPAD_INIT_FAILED;
+    
+    // uni_bt_allowlist_remove_all();
 
     // Needed for global connection status checking
     ds4_init_connection_status();
@@ -77,6 +79,7 @@ ds4_init_e ds4_bluepad32_init(void){
     if(uni_bt_setup() != 0)
         return DS4_INIT_BLUEPAD_INIT_FAILED;
     uni_bt_allowlist_init();
+    uni_bt_allowlist_set_enabled(false); 
     // uni_virtual_device_init();   // No virtual device (touchpad) for now
 
     return 0;

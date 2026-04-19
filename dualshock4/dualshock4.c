@@ -17,42 +17,6 @@
 static btstack_context_callback_registration_t callback_registration;
 static ds4_command_t commands[DS4_NUM_OF_COMMAND_TYPES] = {0}; // An array that is used for storing data of each command type
 
-ds4_init_e ds4Init(void)
-{
-    // If you enable HCI Dump better to disable "Bluepad32 USB Console" from "idf.py menuconfig".
-
-    // Don't use BTstack buffered UART. It conflicts with the console.
-#ifdef CONFIG_ESP_CONSOLE_UART
-#ifndef CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
-    btstack_stdio_init();
-#endif // CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
-#endif // CONFIG_ESP_CONSOLE_UART
-
-    // Configure BTstack for ESP32 VHCI Controller
-    if (btstack_init() != 0)
-        return DS4_INIT_BTSTACK_INIT_FAILED;
-
-    // Get pointer to a struct containing all functions for the platform
-    // Then set that struct for uni platform
-    uni_platform_set_custom(get_ds4_platform());
-
-    // Init Bluepad32 with no arguments
-    if (uni_init(0 /* argc */, NULL /* argv */) != 0)
-        return DS4_INIT_BLUEPAD_INIT_FAILED;
-
-    // Needed for global connection status checking
-    ds4_init_connection_status();
-
-#ifdef CONFIG_DS4_MODE_EVENT
-    ds4_event_handling_init_e buttons_event_handler_init_error;
-    buttons_event_handler_init_error = ds4_init_buttons_event_handler();
-    if (buttons_event_handler_init_error != DS4_INIT_EVENT_SUCCES)
-        return DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_FAILED;
-#endif
-
-    return DS4_INIT_SUCCES;
-}
-
 ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
 {
     ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
@@ -191,7 +155,7 @@ void ds4Disconnect(void)
     }
 }
 
-ds4_set_addr_e ds4SetAddress(const char *MAC)
+ds4_set_addr_e ds4AllowDevice(const char *MAC)
 {
     char current_char;
     bd_addr_t addr = {0};
@@ -251,6 +215,9 @@ ds4_set_addr_e ds4SetAddress(const char *MAC)
 }
 
 // Private functions
+
+// 0C:DC:7E:63:02:B6    ESP
+// 40:1B:5F:69:9B:88    DS4
 
 void ds4_run_loop(void)
 {

@@ -63,12 +63,6 @@ void default_ds4_platform_init_on_init_complete(void)
     // Start scanning
     // uni_bt_start_scanning_and_autoconnect_unsafe();
     // uni_bt_allow_incoming_connections(true);
-
-    // Based on runtime condition, you can delete or list the stored BT keys.
-    if (1)
-        uni_bt_del_keys_unsafe();
-    else
-        uni_bt_list_keys_unsafe();
 }
 
 /**
