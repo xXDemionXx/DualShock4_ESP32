@@ -7,7 +7,6 @@
 #define DUALSHOCK4_DEFAULT_NAME "dualshock4" // Name of the controller (prefixes it's messages to the console)
 
 // Function prototypes
-platform_instance_t *default_get_ds4_platform_instance(uni_hid_device_t *d);
 
 /**
  * @brief Do something for controller during init

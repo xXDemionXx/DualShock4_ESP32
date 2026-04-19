@@ -7,9 +7,11 @@
 #include "ds4_event_handling.h"
 #endif
 
-// Function prototypes
-// static void trigger_event_on_gamepad(uni_hid_device_t* d); Unimplemented yet
+// Private function prototypes
 platform_instance_t *default_get_ds4_platform_instance(uni_hid_device_t *d);
+
+
+// Public functions
 
 /**
  * @brief Do something for controller during init
@@ -59,8 +61,8 @@ void default_ds4_platform_init_on_init_complete(void)
     // Safe to call "unsafe" functions since they are called from BT thread
 
     // Start scanning
-    uni_bt_start_scanning_and_autoconnect_unsafe();
-    uni_bt_allow_incoming_connections(true);
+    // uni_bt_start_scanning_and_autoconnect_unsafe();
+    // uni_bt_allow_incoming_connections(true);
 
     // Based on runtime condition, you can delete or list the stored BT keys.
     if (1)
@@ -145,7 +147,7 @@ uni_error_t default_ds4_platform_on_device_ready(uni_hid_device_t *d)
     platform_instance_t *ins = default_get_ds4_platform_instance(d);
     ins->gamepad_seat = GAMEPAD_SEAT_A;
 
-    d->report_parser.set_lightbar_color(d, 200, 200, 0);
+    // d->report_parser.set_lightbar_color(d, 200, 200, 0);
 
     return UNI_ERROR_SUCCESS;
 }
@@ -190,10 +192,7 @@ void default_ds4_platform_on_oob_event(uni_platform_oob_event_t event, void *dat
  */
 void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller_t *ctl)
 {
-    // static uint8_t leds = 0;
-    // static uint8_t enabled = true;
     static uni_controller_t prev = {0};
-    // uni_gamepad_t* gp;
 
     // Optimization to avoid processing the previous data so that the console
     // does not get spammed with a lot of logs, but remove it from your project.

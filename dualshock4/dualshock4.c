@@ -7,6 +7,7 @@
 #include "ds4_event_handling.h"
 #include "dualshock4_connection_status_modify.h"
 #include "bt/uni_bt_conn.h"
+#include <string.h>
 
 // Local defines
 #define DS4_COMMAND_TASK_SEND_TIME 100 // In ms
@@ -188,6 +189,65 @@ void ds4Disconnect(void)
         set_ds4_connection_status(DS4_DISCONNECTING);
         uni_bt_disconnect_device_safe(DS4_DEVICE_IDX);
     }
+}
+
+ds4_set_addr_e ds4SetAddress(const char *MAC)
+{
+    char current_char;
+    bd_addr_t addr = {0};
+    char hex_numer_string[3] = {'0', '0', '\0'};
+    uint8_t number_string_idx = 0;
+    uint8_t addr_idx = 0;
+    char *endptr;
+
+    if (strlen(MAC) != 17) // Invalid string length
+        return -1;
+
+    for (uint8_t i = 0; i < 17; i++)
+    {
+        current_char = MAC[i];
+
+        if (current_char == ':')
+        {
+            if (
+                // Checks if ':' is in an unexpected place (XX:XX:XX:XX:XX:XX)
+                (i != 2) &&
+                (i != 5) &&
+                (i != 8) &&
+                (i != 11) &&
+                (i != 14))
+            {
+                printf("Wrong ':' placement\n");
+                return DS4_ADDR_ADD_FAIL_FORMATING;
+            }
+            else
+            {
+                number_string_idx = 0; // Reset for the next number
+                addr[addr_idx] = (uint8_t)strtol(hex_numer_string, &endptr, 16);
+                addr_idx++;
+                if (*endptr != '\0')
+                    return -1; // Invalid character for HEX
+            }
+        }
+        else
+        {
+            if (number_string_idx > 1)
+                return -1;
+
+            hex_numer_string[number_string_idx] = current_char;
+            number_string_idx++;
+        }
+    }
+
+    // The last number is gotten outside of the loop
+    addr[addr_idx] = (uint8_t)strtol(hex_numer_string, &endptr, 16);
+    if (*endptr != '\0')
+        return DS4_ADDR_ADD_FAIL_FORMATING; // Invalid character for HEX
+
+    if (uni_bt_allowlist_add_addr(addr) != true)
+        return DS4_ADDR_ADD_FAIL_COULDNT_ADD;
+
+    return DS4_ADDR_ADD_SUCCESS;
 }
 
 // Private functions

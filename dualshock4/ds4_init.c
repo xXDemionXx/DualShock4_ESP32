@@ -4,6 +4,7 @@
 #include "dualshock4_connection_status_modify.h"
 #include "btstack_defines.h"
 #include "bt/uni_bt_conn.h"
+#include <stdint.h>
 //#include "dualshock4_initializer.h"
 
 #include "platform/uni_platform.h"
@@ -17,7 +18,7 @@
 #include "uni_virtual_device.h"
 
 // Private function prototypes
-void ds4_bluepad32_init(void);
+ds4_init_e ds4_bluepad32_init(void);
 
 ds4_init_e ds4Init(void)
 {
@@ -35,11 +36,8 @@ ds4_init_e ds4Init(void)
         return DS4_INIT_BTSTACK_INIT_FAILED;
     
     // Init Bluepad32
-    ds4_bluepad32_init();
-
-    // // Init Bluepad32 with no arguments
-    // if (uni_init(0 /* argc */, NULL /* argv */) != 0)
-    //     return DS4_INIT_BLUEPAD_INIT_FAILED;
+    if(ds4_bluepad32_init() != 0)
+        return DS4_INIT_BLUEPAD_INIT_FAILED;
 
     // Needed for global connection status checking
     ds4_init_connection_status();
@@ -54,7 +52,7 @@ ds4_init_e ds4Init(void)
     return DS4_INIT_SUCCES;
 }
 
-void ds4_bluepad32_init(void){
+ds4_init_e ds4_bluepad32_init(void){
 
     // Get pointer to a struct containing all functions for the platform
     // Then set that struct for uni platform
@@ -63,6 +61,7 @@ void ds4_bluepad32_init(void){
     // Disable stdout buffering
     setbuf(stdout, NULL);
 
+    // Honoring Bluepad32 license
     loge("Bluepad32 (C) 2016-2025 Ricardo Quesada and contributors.\n");
     loge("Version: v" UNI_VERSION_STRING "\n");
 
@@ -75,7 +74,10 @@ void ds4_bluepad32_init(void){
     uni_hid_device_setup();
 
     // Continue with bluetooth setup.
-    uni_bt_setup();
+    if(uni_bt_setup() != 0)
+        return DS4_INIT_BLUEPAD_INIT_FAILED;
     uni_bt_allowlist_init();
-    // uni_virtual_device_init();
+    // uni_virtual_device_init();   // No virtual device (touchpad) for now
+
+    return 0;
 }
