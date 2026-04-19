@@ -44,7 +44,7 @@ void ds4_run_loop(void);
  *
  * @return With what state did the initialization exit.
  */
-ds4_init_e ds4_init(void);
+ds4_init_e ds4Init(void);
 
 /**
  * @brief Set the RGB value of the lightbar
@@ -131,7 +131,7 @@ void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger
  * Access your variable like you are accessing a normal struct. The polling aproach will
  * not guarante that you allways read the freshest data, just that incoming controller
  * data will continuously be saved into the variable given by the pointer.
- * 
+ *
  */
 void ds4SetPollingStruct(ds4_data_t *p);
 

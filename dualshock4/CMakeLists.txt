@@ -6,6 +6,7 @@ set(srcs
          "dualshock4_connection_status_modify.c"
          "receive/polling/polling.c"
          "send/controller_commands.c"
+         "ds4_init.c"
          )
 
 set(includes

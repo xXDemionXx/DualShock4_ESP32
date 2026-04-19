@@ -1,4 +1,5 @@
 #include "dualshock4.h"
+#include "ds4_init.h"
 #include "dualshock4_initializer.h"
 #include "dualshock4_connection_status_modify.h"
 #include "controller_commands.h"
@@ -6,7 +7,6 @@
 #include "ds4_event_handling.h"
 #include "dualshock4_connection_status_modify.h"
 #include "bt/uni_bt_conn.h"
-
 
 // Local defines
 #define DS4_COMMAND_TASK_SEND_TIME 100 // In ms
@@ -16,7 +16,7 @@
 static btstack_context_callback_registration_t callback_registration;
 static ds4_command_t commands[DS4_NUM_OF_COMMAND_TYPES] = {0}; // An array that is used for storing data of each command type
 
-ds4_init_e ds4_init(void)
+ds4_init_e ds4Init(void)
 {
     // If you enable HCI Dump better to disable "Bluepad32 USB Console" from "idf.py menuconfig".
 
