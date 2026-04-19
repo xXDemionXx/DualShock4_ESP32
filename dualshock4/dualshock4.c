@@ -188,8 +188,6 @@ void ds4Disconnect(void)
         set_ds4_connection_status(DS4_DISCONNECTING);
         uni_bt_disconnect_device_safe(DS4_DEVICE_IDX);
     }
-    else
-        ESP_LOGI("SFDS", "sdada");
 }
 
 // Private functions
