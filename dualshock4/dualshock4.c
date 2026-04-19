@@ -1,28 +1,21 @@
 #include "dualshock4.h"
-
 #include "dualshock4_initializer.h"
-// #include "dualshock4_task_commands.h"
 #include "dualshock4_connection_status_modify.h"
-#include "dualshock4_device_handle.h"
-
 #include "controller_commands.h"
 #include "btstack_defines.h"
+#include "ds4_event_handling.h"
+#include "dualshock4_connection_status_modify.h"
+#include "bt/uni_bt_conn.h"
+
 
 // Local defines
 #define DS4_COMMAND_TASK_SEND_TIME 100 // In ms
 //
 
 // Private variables
-static ds4_device_handle ds4 = NULL;
 static btstack_context_callback_registration_t callback_registration;
+static ds4_command_t commands[DS4_NUM_OF_COMMAND_TYPES] = {0}; // An array that is used for storing data of each command type
 
-static ds4_command_t commands[DS4_NUM_OF_COMMAND_TYPES] = {0};  // An array that is used for storing data of each command type
-
-/**
- * @brief Sets up everything needed for ds4 before we can connect.
- *
- * @return With what state did the initialization exit.
- */
 ds4_init_e ds4_init(void)
 {
     // If you enable HCI Dump better to disable "Bluepad32 USB Console" from "idf.py menuconfig".
@@ -37,8 +30,6 @@ ds4_init_e ds4_init(void)
     // Configure BTstack for ESP32 VHCI Controller
     if (btstack_init() != 0)
         return DS4_INIT_BTSTACK_INIT_FAILED;
-
-    ds4_set_device_handle(&ds4);
 
     // Get pointer to a struct containing all functions for the platform
     // Then set that struct for uni platform
@@ -63,12 +54,14 @@ ds4_init_e ds4_init(void)
 
 ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
 {
+    ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
+
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
-    
+
     // The callback sets the command status to AVAILABLE when it is done sending
-    if(commands[DS4_COMMAND_LIGHTBAR].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+    if (commands[DS4_COMMAND_LIGHTBAR].status == DS4_COMMAND_STATUS_UNAVAILABLE)
         return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
 
     commands[DS4_COMMAND_LIGHTBAR].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
@@ -86,12 +79,14 @@ ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
 
 ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
 {
+    ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
+
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
-    
+
     // The callback sets the command status to AVAILABLE when it is done sending
-    if(commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+    if (commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
         return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
 
     commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
@@ -110,12 +105,14 @@ ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t 
 
 ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
 {
+    ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
+
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
     // The callback sets the command status to AVAILABLE when it is done sending
-    if(commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+    if (commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
         return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
 
     commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
@@ -134,12 +131,14 @@ ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint1
 
 ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
 {
+    ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
+
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
     // The callback sets the command status to AVAILABLE when it is done sending
-    if(commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+    if (commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
         return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
 
     commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
@@ -158,12 +157,14 @@ ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uin
 
 ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay)
 {
+    ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
+
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
         return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
 
     // The callback sets the command status to AVAILABLE when it is done sending
-    if(commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
+    if (commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
         return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
 
     commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
@@ -178,6 +179,17 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
     return DS4_COMMAND_SEND_SUCCES;
+}
+
+void ds4Disconnect(void)
+{
+    if (ds4GetConnectionStatus() == DS4_READY)
+    {
+        set_ds4_connection_status(DS4_DISCONNECTING);
+        uni_bt_disconnect_device_safe(DS4_DEVICE_IDX);
+    }
+    else
+        ESP_LOGI("SFDS", "sdada");
 }
 
 // Private functions

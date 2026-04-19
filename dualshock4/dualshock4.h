@@ -126,15 +126,23 @@ void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger
 #endif
 
 /**
- * @brief Pass the pointer to your ds4_data_t variable that you can use for polling
+ * @brief Pass the pointer to your ds4_data_t variable that you can use to access button values
  *
  * Access your variable like you are accessing a normal struct. The polling aproach will
  * not guarante that you allways read the freshest data, just that incoming controller
  * data will continuously be saved into the variable given by the pointer.
+ * 
  */
 void ds4SetPollingStruct(ds4_data_t *p);
 
+/**
+ * @brief Disconnect the controller
+ *
+ * If you want to use it on a button event, use it like this:
+ * ds4SetButtonEvent(SOME_BUTTON, SOME_EVENT, (void (*)(void *))ds4Disconnect, NULL);
+ */
+void ds4Disconnect(void);
+
 // void ds4Autoconnect();
-// void ds4Disconnect();
 
 #endif // DUALSHOCK4_H

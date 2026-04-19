@@ -23,6 +23,8 @@
 #error "Enable Bluetooth in sdkconfig!"
 #endif
 
+#define DS4_DEVICE_IDX  0   // Only one device at any time allowed so the ID
+
 // Types
 typedef struct uni_platform ds4_platform;
 typedef struct uni_platform *ds4_platform_handle;

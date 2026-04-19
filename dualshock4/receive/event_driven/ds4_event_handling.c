@@ -48,11 +48,21 @@ static QueueHandle_t queue_handle = NULL;
 static TaskHandle_t task_handle = NULL;
 
 // Private function prototypes
+
+/**
+ * @brief Task that checks if button has events set for checking, reeds their states and calls the event checker.
+ */
 static void event_handler_task(void *p_parameter);
+
+/**
+ * @brief Check all the events on the button set for monitoring, calls the trigger function if event found.
+ */
 static void event_checker(btn_t *btn);
+
 static inline ds4_btn_event_e event_check_btn_press(uint8_t state, uint8_t prev_state);
 static inline ds4_btn_event_e event_check_btn_release(uint8_t state, uint8_t prev_state);
 static inline void trigger_event_function(uint8_t found_event, btn_event_settings_s *settings);
+
 
 // Public functions
 
@@ -67,8 +77,14 @@ BaseType_t ds4_send_data_to_event_handler(ds4_data_t *data)
 
 void ds4_suspend_buttons_event_handler()
 {
-    if (task_handle != NULL)
+    if (task_handle != NULL){
         vTaskSuspend(task_handle);
+        // Reset the button states
+        for(uint8_t current_button = 0; current_button < DS4_NUM_OF_BUTTONS; current_button++){
+            buttons[current_button].states.current_state = DS4_BTN_STATE_RELEASED;
+            buttons[current_button].states.prev_state = DS4_BTN_STATE_RELEASED;
+        }
+    }
 }
 
 void ds4_resume_buttons_event_handler()
@@ -107,11 +123,9 @@ void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger
     memset(&buttons[button].states, 0, sizeof(buttons[button].states));
 }
 
+
 // Private functions
 
-/**
- * @brief When new data is available parse it and call event_checker() on buttons that monitor events
- */
 static void event_handler_task(void *p_parameter)
 {
     ds4_data_t data;
@@ -142,11 +156,6 @@ static void event_handler_task(void *p_parameter)
     }
 }
 
-/**
- * @brief Check all the events on the button set for monitoring, calls the trigger function if event found.
- *
- * Needs further research
- */
 void event_checker(btn_t *btn)
 {
     btn_event_bits_t found_event_MASK;
@@ -181,8 +190,10 @@ static inline ds4_btn_event_e event_check_btn_press(uint8_t state, uint8_t prev_
 {
     if (prev_state == DS4_BTN_STATE_RELEASED && state == DS4_BTN_STATE_PRESSED)
         return DS4_BTN_EVENT_PRESS;
-    else
+    else{
         return DS4_BTN_EVENT_NO_EVENT;
+        // vTaskDelay(pdTICKS_TO_MS(1000));
+    }
 }
 
 inline static ds4_btn_event_e event_check_btn_release(uint8_t state, uint8_t prev_state)

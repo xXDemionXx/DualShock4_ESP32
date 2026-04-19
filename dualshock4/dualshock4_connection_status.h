@@ -7,6 +7,7 @@ typedef enum
 {
     DS4_READY,
     DS4_CONNECTED,
+    DS4_DISCONNECTING,
     DS4_DISCONNECTED
 } ds4_connection_status_e;
 

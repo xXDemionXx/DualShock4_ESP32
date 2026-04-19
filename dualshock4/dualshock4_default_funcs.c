@@ -1,7 +1,6 @@
 #include "dualshock4_initializer.h"
 #include "dualshock4_default_funcs.h"
 #include "dualshock4_connection_status_modify.h"
-#include "dualshock4_device_handle.h"
 #include "ds4_polling.h"
 
 #ifdef CONFIG_DS4_MODE_EVENT
@@ -121,11 +120,9 @@ void default_ds4_platform_on_device_connected(uni_hid_device_t *d)
 void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_DISCONNECTED);
-    // Erase the handle of the device
-    ds4_pass_device_handle(NULL);
     
 #ifdef CONFIG_DS4_MODE_EVENT
-    ds4_resume_buttons_event_handler();
+    ds4_suspend_buttons_event_handler();
 #endif
 
     logi(DUALSHOCK4_DEFAULT_NAME ": device disconnected: %p\n", d);
@@ -142,8 +139,6 @@ void default_ds4_platform_on_device_disconnected(uni_hid_device_t *d)
 uni_error_t default_ds4_platform_on_device_ready(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_READY);
-    // Pass the handle to the connected device
-    ds4_pass_device_handle((ds4_device_handle)d);
 
     logi(DUALSHOCK4_DEFAULT_NAME ": device ready: %p\n", d);
 
