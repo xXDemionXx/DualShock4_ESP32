@@ -7,6 +7,7 @@
 #include "ds4_event_handling.h"
 #include "dualshock4_connection_status_modify.h"
 #include "bt/uni_bt_conn.h"
+#include "esp_mac.h"
 #include <string.h>
 
 // Local defines
@@ -160,7 +161,14 @@ void ds4Disconnect(void)
     }
 }
 
-void ds4ConnectionAddress(const char *MAC_string)
+void ds4GetUserAddress(char buffer[18])
+{
+    bd_addr_t addr;
+    gap_local_bd_addr(addr);
+    snprintf(buffer, 18, "%02X:%02X:%02X:%02X:%02X:%02X", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
+}
+
+void ds4SetUserAddress(const char *MAC_string)
 {
 }
 

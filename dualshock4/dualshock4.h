@@ -144,6 +144,11 @@ void ds4SetPollingStruct(ds4_data_t *p);
 void ds4Disconnect(void);
 
 /**
+ * @brief Fills your buffer with the MAC string which this device uses
+ */
+void ds4GetUserAddress(char buffer[18]);
+
+/**
  * @brief Set the address of the controller
  *
  * Set the MAC address of the device that can connect to us
