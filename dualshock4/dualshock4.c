@@ -178,6 +178,10 @@ bool ds4AllowDevice(const char *MAC_string)
         return false;
 }
 
+void ds4UnallowDevices(void){
+    uni_bt_allowlist_remove_all();
+}
+
 void ds4_run_loop(void)
 {
     // Does not return.

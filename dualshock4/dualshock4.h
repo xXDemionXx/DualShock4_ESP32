@@ -154,6 +154,11 @@ void ds4Disconnect(void);
 bool ds4AllowDevice(const char *MAC);
 
 /**
+ * @brief Unallows all devices that have been allowed to connect
+ */
+void ds4UnallowDevices(void);
+
+/**
  * @brief Set the address of the controller
  *
  * Set the MAC address to which to connect to (the connection will start when the controller turns on)
