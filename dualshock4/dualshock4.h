@@ -30,13 +30,6 @@ typedef enum
 
 typedef enum
 {
-    DS4_ADDR_ADD_SUCCESS,
-    DS4_ADDR_ADD_FAIL_FORMATING,  // The string you passed to ds4SetAddress() was formated wrong
-    DS4_ADDR_ADD_FAIL_COULDNT_ADD // String passed correctly but for some reason couldn't add address to allow list
-} ds4_set_addr_e;
-
-typedef enum
-{
     DS4_COMMAND_SEND_SUCCES,
     DS4_COMMAND_SEND_FAIL_NO_CONTROLLER,
     DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT
@@ -153,11 +146,20 @@ void ds4Disconnect(void);
 /**
  * @brief Set the address of the controller
  *
+ * Set the MAC address of the device that can connect to us
+ *
+ * @param MAC String containing the MAC address (example formating: "40:1B:5F:69:9B:88")
+ * @return false if failed
+ */
+bool ds4AllowDevice(const char *MAC);
+
+/**
+ * @brief Set the address of the controller
+ *
  * Set the MAC address to which to connect to (the connection will start when the controller turns on)
  *
  * @param MAC String containing the MAC address (example formating: "40:1B:5F:69:9B:88")
  */
-ds4_set_addr_e ds4AllowDevice(const char *MAC);
 
 // void ds4Autoconnect();
 

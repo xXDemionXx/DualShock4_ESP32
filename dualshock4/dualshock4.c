@@ -17,6 +17,11 @@
 static btstack_context_callback_registration_t callback_registration;
 static ds4_command_t commands[DS4_NUM_OF_COMMAND_TYPES] = {0}; // An array that is used for storing data of each command type
 
+// Private function prototypes
+static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC);
+
+// Public function prototypes
+
 ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
 {
     ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
@@ -155,21 +160,48 @@ void ds4Disconnect(void)
     }
 }
 
-ds4_set_addr_e ds4AllowDevice(const char *MAC)
+void ds4ConnectionAddress(const char *MAC_string)
+{
+}
+
+bool ds4AllowDevice(const char *MAC_string)
+{
+    bd_addr_t addr;
+    if (string_to_MAC(MAC_string, &addr))
+    {
+        if (uni_bt_allowlist_add_addr(addr) == true)
+            return true;
+        else
+            return false;
+    }
+    else
+        return false;
+}
+
+void ds4_run_loop(void)
+{
+    // Does not return.
+    btstack_run_loop_execute();
+}
+
+// Private functions
+
+// MAC is the return array
+// Returns false if formating error
+static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC)
 {
     char current_char;
-    bd_addr_t addr = {0};
-    char hex_numer_string[3] = {'0', '0', '\0'};
-    uint8_t number_string_idx = 0;
-    uint8_t addr_idx = 0;
-    char *endptr;
+    char hex_buff[3] = {'0', '0', '\0'};
+    uint8_t hex_idx = 0;
+    uint8_t MAC_idx = 0;
+    char *endptr; // Used for checking if strtol() found invalid characters
 
-    if (strlen(MAC) != 17) // Invalid string length
-        return -1;
+    if (strlen(MAC_string) != 17) // Invalid string length
+        return false;
 
     for (uint8_t i = 0; i < 17; i++)
     {
-        current_char = MAC[i];
+        current_char = MAC_string[i];
 
         if (current_char == ':')
         {
@@ -181,46 +213,31 @@ ds4_set_addr_e ds4AllowDevice(const char *MAC)
                 (i != 11) &&
                 (i != 14))
             {
-                printf("Wrong ':' placement\n");
-                return DS4_ADDR_ADD_FAIL_FORMATING;
+                return false;
             }
             else
             {
-                number_string_idx = 0; // Reset for the next number
-                addr[addr_idx] = (uint8_t)strtol(hex_numer_string, &endptr, 16);
-                addr_idx++;
+                hex_idx = 0; // Reset for the next number
+                (*MAC)[MAC_idx] = (uint8_t)strtol(hex_buff, &endptr, 16);
+                MAC_idx++;
                 if (*endptr != '\0')
-                    return -1; // Invalid character for HEX
+                    return false; // Invalid character for HEX
             }
         }
         else
         {
-            if (number_string_idx > 1)
-                return -1;
+            if (hex_idx > 1)
+                return false;
 
-            hex_numer_string[number_string_idx] = current_char;
-            number_string_idx++;
+            hex_buff[hex_idx] = current_char;
+            hex_idx++;
         }
     }
 
     // The last number is gotten outside of the loop
-    addr[addr_idx] = (uint8_t)strtol(hex_numer_string, &endptr, 16);
+    (*MAC)[MAC_idx] = (uint8_t)strtol(hex_buff, &endptr, 16);
     if (*endptr != '\0')
-        return DS4_ADDR_ADD_FAIL_FORMATING; // Invalid character for HEX
+        return false; // Invalid character for HEX
 
-    if (uni_bt_allowlist_add_addr(addr) != true)
-        return DS4_ADDR_ADD_FAIL_COULDNT_ADD;
-
-    return DS4_ADDR_ADD_SUCCESS;
-}
-
-// Private functions
-
-// 0C:DC:7E:63:02:B6    ESP
-// 40:1B:5F:69:9B:88    DS4
-
-void ds4_run_loop(void)
-{
-    // Does not return.
-    btstack_run_loop_execute();
+    return true;
 }
