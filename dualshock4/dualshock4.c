@@ -170,7 +170,10 @@ bool ds4AllowDevice(const char *MAC_string)
     if (string_to_MAC(MAC_string, &addr))
     {
         if (uni_bt_allowlist_add_addr(addr) == true)
+        {
+            uni_bt_allowlist_set_enabled(true); // If not allready enabled
             return true;
+        }
         else
             return false;
     }
@@ -178,8 +181,10 @@ bool ds4AllowDevice(const char *MAC_string)
         return false;
 }
 
-void ds4UnallowDevices(void){
+void ds4UnallowDevices(void)
+{
     uni_bt_allowlist_remove_all();
+    uni_bt_allowlist_set_enabled(false);
 }
 
 void ds4_run_loop(void)

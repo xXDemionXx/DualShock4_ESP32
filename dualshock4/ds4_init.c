@@ -79,7 +79,7 @@ ds4_init_e ds4_bluepad32_init(void){
     if(uni_bt_setup() != 0)
         return DS4_INIT_BLUEPAD_INIT_FAILED;
     uni_bt_allowlist_init();
-    uni_bt_allowlist_set_enabled(false); 
+    uni_bt_allowlist_set_enabled(false);    // This ensures that the user is explicitly required to call ds4AllowDevice()
     // uni_virtual_device_init();   // No virtual device (touchpad) for now
 
     return 0;
