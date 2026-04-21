@@ -3,7 +3,6 @@ set(srcs
          "dualshock4.c"
          "dualshock4_default_funcs.c"
          "dualshock4_connection_status.c"
-         "dualshock4_connection_status_modify.c"
          "receive/polling/polling.c"
          "send/controller_commands.c"
          "ds4_init.c"

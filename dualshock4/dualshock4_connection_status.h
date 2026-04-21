@@ -14,9 +14,8 @@ typedef enum
 /**
  * @brief Returns the connection status
  *
- * Possible states are: disconnected, connected, ready.
- * Usually you should ignore connected status and only
- * interact with the controller when it is ready.
+ * Possible states are: ready, connected, disconnecting, disconnected.
+ * Interact with the controller only when it is "ready" state.
  */
 ds4_connection_status_e ds4GetConnectionStatus(void);
 
