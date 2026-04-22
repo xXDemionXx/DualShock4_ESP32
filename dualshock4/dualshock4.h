@@ -17,15 +17,15 @@
 // Types
 
 /**
- * @brief Describes how the initialization process went.
+ * @brief Describes how the initialization process went
  */
 typedef enum
 {
     DS4_INIT_SUCCES,
+    DS4_INIT_BAD_MAC,
     DS4_INIT_BTSTACK_INIT_FAILED,
     DS4_INIT_BLUEPAD_INIT_FAILED,
     DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_FAILED,
-    DS4_INIT_FAILED
 } ds4_init_e;
 
 typedef enum
@@ -40,11 +40,16 @@ typedef enum
 void ds4_run_loop(void);
 
 /**
- * @brief Sets up everything needed for ds4 before we can connect.
+ * @brief Sets up everything needed for ds4 before we can connect
  *
+ * @param MAC String literal MAC of format "XX:XX:XX:XX:XX:XX"
+ *      The MAC address on which we will be, set it to the address
+ *      that is stored on the controller you want to connect to.
+ *      If you pass in NULL the default Bluetooth MAC will be used
+ *      which depends on your chip.
  * @return With what state did the initialization exit.
  */
-ds4_init_e ds4Init(void);
+ds4_init_e ds4Init(const char *MAC);
 
 /**
  * @brief Set the RGB value of the lightbar
@@ -162,15 +167,5 @@ bool ds4AllowDevice(const char *MAC);
  * @brief Unallows all devices that have been allowed to connect
  */
 void ds4UnallowDevices(void);
-
-/**
- * @brief Set the address of the controller
- *
- * Set the MAC address to which to connect to (the connection will start when the controller turns on)
- *
- * @param MAC String containing the MAC address (example formating: "40:1B:5F:69:9B:88")
- */
-
-// void ds4Autoconnect();
 
 #endif // DUALSHOCK4_H
