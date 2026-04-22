@@ -18,7 +18,7 @@
 #include "uni_virtual_device.h"
 
 // Private function prototypes
-ds4_init_e ds4_bluepad32_init(void);
+static ds4_init_e ds4_bluepad32_init(void);
 
 ds4_init_e ds4Init(void)
 {
@@ -41,9 +41,6 @@ ds4_init_e ds4Init(void)
     
     // uni_bt_allowlist_remove_all();
 
-    // Needed for global connection status checking
-    ds4_init_connection_status();
-
 #ifdef CONFIG_DS4_MODE_EVENT
     ds4_event_handling_init_e buttons_event_handler_init_error;
     buttons_event_handler_init_error = ds4_init_buttons_event_handler();
@@ -54,7 +51,7 @@ ds4_init_e ds4Init(void)
     return DS4_INIT_SUCCES;
 }
 
-ds4_init_e ds4_bluepad32_init(void){
+static ds4_init_e ds4_bluepad32_init(void){
 
     // Get pointer to a struct containing all functions for the platform
     // Then set that struct for uni platform
