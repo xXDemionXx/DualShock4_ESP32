@@ -1,7 +1,6 @@
 set(srcs
          "dualshock4_initializer.c" 
          "dualshock4.c"
-         "dualshock4_default_funcs.c"
          "dualshock4_connection_status.c"
          "receive/polling/polling.c"
          "send/controller_commands.c"
