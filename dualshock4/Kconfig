@@ -3,6 +3,9 @@ menu "DualShock4 Configuration"
     choice DS4_MODE
         prompt "DualShock4 operation mode"
         default DS4_MODE_EVENT
+        help
+            Will you only be using polling or
+            do you want to also attach events to buttons
     
     config DS4_MODE_EVENT
         bool "Event-based mode"
@@ -11,5 +14,48 @@ menu "DualShock4 Configuration"
         bool "Just polling"
 
     endchoice
+
+
+    choice DS4_BT_MAC_MODE
+        prompt "Bluetooth MAC Address Mode"
+        default DS4_BT_MAC_DEFAULT
+
+    config DS4_BT_MAC_DEFAULT
+        bool "Use default ESP32 Bluetooth MAC"
+
+    config DS4_BT_MAC_CUSTOM
+        bool "Use custom Bluetooth MAC"
+
+    endchoice
+
+    config DS4_BT_CUSTOM_MAC_STRING
+        string "Custom Bluetooth MAC Address"
+        depends on DS4_BT_MAC_CUSTOM
+        default "AA:BB:CC:DD:EE:FF"
+        help
+            Enter MAC in format:
+            XX:XX:XX:XX:XX:XX
+    
+    
+    choice DS4_CONTROLLER_CONNECT_MODE
+        prompt "Controller connect mode"
+        default DS4_AUTOCONNECT_MODE
+
+    config DS4_AUTOCONNECT_MODE
+        bool "Autoconnect to any discovered device"
+
+    config DS4_CONNECT_TO_SPECIFIC_MAC
+        bool "Connect only to a specific MAC address of the controller"
+
+    endchoice
+
+    config DS4_CONTROLLER_MAC_STRING
+        string "MAC address of your controller"
+        depends on DS4_CONNECT_TO_SPECIFIC_MAC
+        default "XX:XX:XX:XX:XX:XX"
+        help
+            Enter MAC in format:
+            XX:XX:XX:XX:XX:XX
+    
 
 endmenu
