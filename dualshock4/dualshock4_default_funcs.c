@@ -46,6 +46,16 @@ void ds4_on_init_complete(void)
     // Start scanning
     // uni_bt_start_scanning_and_autoconnect_unsafe();
     // uni_bt_allow_incoming_connections(true);
+
+    // Start scanning
+    uni_bt_start_scanning_and_autoconnect_unsafe();
+    uni_bt_allow_incoming_connections(true);
+
+    // Based on runtime condition, you can delete or list the stored BT keys.
+    if (1)
+        uni_bt_del_keys_unsafe();
+    else
+        uni_bt_list_keys_unsafe();
 }
 
 uni_error_t ds4_on_device_discovered(bd_addr_t addr, const char *name, uint16_t cod, uint8_t rssi)

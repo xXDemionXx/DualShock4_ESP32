@@ -16,6 +16,9 @@
 #include "uni_property.h"
 #include "uni_version.h"
 #include "uni_virtual_device.h"
+#include "esp_mac.h"
+
+const uint8_t a[6] = {0x11, 0x11, 0x11, 0x11, 0x11, 0x11};
 
 // Private function prototypes
 static ds4_init_e ds4_bluepad32_init(void);
@@ -30,6 +33,8 @@ ds4_init_e ds4Init(void)
     btstack_stdio_init();
 #endif // CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
 #endif // CONFIG_ESP_CONSOLE_UART
+
+    // esp_iface_mac_addr_set(a, ESP_MAC_BT);
 
     // Configure BTstack for ESP32 VHCI Controller
     if (btstack_init() != 0)
