@@ -1,7 +1,10 @@
 #include "dualshock4_initializer.h"
 #include "dualshock4_connection_status_modify.h"
 #include "ds4_polling.h"
+
 #include "uni.h"
+#include "dualshock4_connection_status_modify.h"
+#include <stdatomic.h>
 
 #ifdef CONFIG_DS4_MODE_EVENT
 #include "ds4_event_handling.h"
@@ -12,7 +15,51 @@
 #define DUALSHOCK4_DEFAULT_NAME "dualshock4" // Name of the controller (prefixes it's messages to the console)
 #define DS4_DEFAULT_SEAT GAMEPAD_SEAT_A
 
+
+// Private function prototypes
+
+static void ds4_on_init(int argc, const char **argv);
+static void ds4_on_init_complete(void);
+static uni_error_t ds4_on_device_discovered(bd_addr_t addr, const char *name, uint16_t cod, uint8_t rssi);
+static void ds4_on_device_connected(uni_hid_device_t *d);
+static void ds4_on_device_disconnected(uni_hid_device_t *d);
+static uni_error_t ds4_on_device_ready(uni_hid_device_t *d);
+static void default_ds4_platform_on_oob_event(uni_platform_oob_event_t event, void *data);
+static void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller_t *ctl);
+static const uni_property_t *default_ds4_platform_get_property(uni_property_idx_t idx);
+
+// Private variables
+
+static _Atomic ds4_connection_status_e ds4_connection_status = DS4_DISCONNECTED;
+
+// This is the instance that holds all callbacks for DS4.
+static ds4_platform ds4_plat = {
+    .name = DUALSHOCK4_DEFAULT_NAME,
+    .init = ds4_on_init,
+    .on_init_complete = ds4_on_init_complete,
+    .on_device_discovered = ds4_on_device_discovered,
+    .on_device_connected = ds4_on_device_connected,
+    .on_device_disconnected = ds4_on_device_disconnected,
+    .on_device_ready = ds4_on_device_ready,
+    .on_oob_event = default_ds4_platform_on_oob_event,
+    .on_controller_data = default_ds4_platform_on_controller_data,
+    .get_property = default_ds4_platform_get_property,
+};
+
+// Public functions
+
+ds4_connection_status_e ds4GetConnectionStatus(void)
+{
+    return atomic_load(&ds4_connection_status);
+}
+
 // Private functions
+
+void set_ds4_connection_status(ds4_connection_status_e status)
+{
+    // if (status == DS4_READY || DS4_CONNECTED || DS4_DISCONNECTED) // Valid statuses
+    atomic_store(&ds4_connection_status, status);
+}
 
 /**
  * @brief Do something for controller during init
@@ -22,7 +69,7 @@
  * @param argc Number of arguments (UNUSED)
  * @param argv Vector of arguments (UNUSED)
  */
-void ds4_on_init(int argc, const char **argv)
+static void ds4_on_init(int argc, const char **argv)
 {
     ARG_UNUSED(argc);
     ARG_UNUSED(argv);
@@ -53,7 +100,7 @@ void ds4_on_init(int argc, const char **argv)
  *
  * Currently we aren't doing anything special.
  */
-void ds4_on_init_complete(void)
+static void ds4_on_init_complete(void)
 {
     logi(DUALSHOCK4_DEFAULT_NAME ": on_init_complete()\n");
 
@@ -80,7 +127,7 @@ void ds4_on_init_complete(void)
  * @param rssi Received Signal Strength Indicator (RSSI) measured in dBms. The higher (255) the better.
  * @return UNI error code, see uni_error.h
  */
-uni_error_t ds4_on_device_discovered(bd_addr_t addr, const char *name, uint16_t cod, uint8_t rssi)
+static uni_error_t ds4_on_device_discovered(bd_addr_t addr, const char *name, uint16_t cod, uint8_t rssi)
 {
     // DualShock 4 is a gamepad so filter out anything that isn't a game pad.
     if (((cod & UNI_BT_COD_MINOR_MASK) & UNI_BT_COD_MINOR_GAMEPAD) != UNI_BT_COD_MINOR_GAMEPAD)
@@ -99,7 +146,7 @@ uni_error_t ds4_on_device_discovered(bd_addr_t addr, const char *name, uint16_t 
  *
  * @param d connected device handle
  */
-void ds4_on_device_connected(uni_hid_device_t *d)
+static void ds4_on_device_connected(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_CONNECTED);
 
@@ -126,7 +173,7 @@ void ds4_on_device_connected(uni_hid_device_t *d)
  *
  * @param d disconnected device handle
  */
-void ds4_on_device_disconnected(uni_hid_device_t *d)
+static void ds4_on_device_disconnected(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_DISCONNECTED);
 
@@ -154,7 +201,7 @@ void ds4_on_device_disconnected(uni_hid_device_t *d)
  * @param d ready device handle
  * @return UNI error code, see uni_error.h
  */
-uni_error_t ds4_on_device_ready(uni_hid_device_t *d)
+static uni_error_t ds4_on_device_ready(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_READY);
 
@@ -175,7 +222,7 @@ uni_error_t ds4_on_device_ready(uni_hid_device_t *d)
  * @param event event that triggered
  * @param data data of the event
  */
-void default_ds4_platform_on_oob_event(uni_platform_oob_event_t event, void *data)
+static void default_ds4_platform_on_oob_event(uni_platform_oob_event_t event, void *data)
 {
     switch (event)
     {
@@ -201,7 +248,7 @@ void default_ds4_platform_on_oob_event(uni_platform_oob_event_t event, void *dat
  * @param d device that sent the data
  * @param ctl controllers data
  */
-void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller_t *ctl)
+static void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller_t *ctl)
 {
     static uni_controller_t prev = {0};
 
@@ -225,27 +272,11 @@ void default_ds4_platform_on_controller_data(uni_hid_device_t *d, uni_controller
  *
  * Needs further research
  */
-const uni_property_t *default_ds4_platform_get_property(uni_property_idx_t idx)
+static const uni_property_t *default_ds4_platform_get_property(uni_property_idx_t idx)
 {
     ARG_UNUSED(idx);
     return NULL;
 }
-
-// Private variables
-
-// This is the instance that holds all callbacks for DS4.
-static ds4_platform ds4_plat = {
-    .name = DUALSHOCK4_DEFAULT_NAME,
-    .init = ds4_on_init,
-    .on_init_complete = ds4_on_init_complete,
-    .on_device_discovered = ds4_on_device_discovered,
-    .on_device_connected = ds4_on_device_connected,
-    .on_device_disconnected = ds4_on_device_disconnected,
-    .on_device_ready = ds4_on_device_ready,
-    .on_oob_event = default_ds4_platform_on_oob_event,
-    .on_controller_data = default_ds4_platform_on_controller_data,
-    .get_property = default_ds4_platform_get_property,
-};
 
 // Public functions
 

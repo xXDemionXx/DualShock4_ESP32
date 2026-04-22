@@ -6,6 +6,7 @@
 #include "dualshock4_initializer.h"
 #include "ds4_polling.h"
 #include "ds4_receive_type.h"
+#include "dualshock4_connection_status_modify.h"
 
 #ifdef CONFIG_DS4_MODE_EVENT
 #include "btn_events.h"
@@ -16,25 +17,23 @@
 
 // Types
 
-/**
- * @brief Describes how the initialization process went
- */
 typedef enum
 {
-    DS4_INIT_SUCCES,
+    DS4_INIT_SUCCESS,
     DS4_INIT_BAD_BLUETOOTH_MAC,
     DS4_INIT_BAD_CONTROLLER_MAC,
     DS4_INIT_BTSTACK_INIT_FAILED,
     DS4_INIT_BLUEPAD_INIT_FAILED,
-    DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_FAILED,
+    DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_INIT_FAILED,
 } ds4_init_e;
 
 typedef enum
 {
-    DS4_COMMAND_SEND_SUCCES,
+    DS4_COMMAND_SEND_SUCCESS,
     DS4_COMMAND_SEND_FAIL_NO_CONTROLLER,
     DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT
 } ds4_command_send_e;
+
 
 // Callable functions
 
@@ -46,6 +45,14 @@ void ds4_run_loop(void);
  * @return With what state did the initialization exit.
  */
 ds4_init_e ds4Init();
+
+/**
+ * @brief Returns the connection status
+ *
+ * Possible states are: ready, connected, disconnecting, disconnected.
+ * Interact with the controller only when it is "ready" state.
+ */
+ds4_connection_status_e ds4GetConnectionStatus(void);
 
 /**
  * @brief Set the RGB value of the lightbar
@@ -132,7 +139,6 @@ void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger
  * Access your variable like you are accessing a normal struct. The polling aproach will
  * not guarante that you allways read the freshest data, just that incoming controller
  * data will continuously be saved into the variable given by the pointer.
- *
  */
 void ds4SetPollingStruct(ds4_data_t *p);
 

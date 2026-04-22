@@ -1,3 +1,4 @@
+#include <string.h>
 #include "dualshock4.h"
 #include "dualshock4_initializer.h"
 #include "dualshock4_connection_status_modify.h"
@@ -9,7 +10,6 @@
 #include "esp_mac.h"
 #include "esp_log.h"
 #include "uni_version.h"
-#include <string.h>
 
 // Private variables
 
@@ -61,10 +61,10 @@ ds4_init_e ds4Init()
     ds4_event_handling_init_e buttons_event_handler_init_error;
     buttons_event_handler_init_error = ds4_init_buttons_event_handler();
     if (buttons_event_handler_init_error != DS4_INIT_EVENT_SUCCES)
-        return DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_FAILED;
+        return DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_INIT_FAILED;
 #endif
 
-    return DS4_INIT_SUCCES;
+    return DS4_INIT_SUCCESS;
 }
 
 ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
@@ -89,7 +89,7 @@ ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
     callback_registration.context = (void *)(&commands[DS4_COMMAND_LIGHTBAR]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCES;
+    return DS4_COMMAND_SEND_SUCCESS;
 }
 
 ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
@@ -115,7 +115,7 @@ ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t 
     callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCES;
+    return DS4_COMMAND_SEND_SUCCESS;
 }
 
 ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
@@ -141,7 +141,7 @@ ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint1
     callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCES;
+    return DS4_COMMAND_SEND_SUCCESS;
 }
 
 ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
@@ -167,7 +167,7 @@ ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uin
     callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCES;
+    return DS4_COMMAND_SEND_SUCCESS;
 }
 
 ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay)
@@ -193,7 +193,7 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
     callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCES;
+    return DS4_COMMAND_SEND_SUCCESS;
 }
 
 void ds4Disconnect(void)
@@ -210,10 +210,6 @@ void ds4GetUserAddress(char buffer[18])
     bd_addr_t addr;
     gap_local_bd_addr(addr);
     snprintf(buffer, 18, "%02X:%02X:%02X:%02X:%02X:%02X", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
-}
-
-void ds4SetUserAddress(const char *MAC_string)
-{
 }
 
 bool ds4AllowDevice(const char *MAC_string)
