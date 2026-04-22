@@ -1,7 +1,7 @@
-#ifndef BTN_DATA_MASKS_H
-#define BTN_DATA_MASKS_H
+#ifndef BTN_CONFIG_H
+#define BTN_CONFIG_H
 
-#include "btns.h"
+#include "ds4_btns.h"
 #include <stdint.h>
 
 typedef struct
@@ -89,4 +89,4 @@ const ds4_button_config_t ds4_button_configs[DS4_NUM_OF_BUTTONS] = {
      >> ds4_button_configs[btn_number].bit_NUM) &                 \
         DS4_BTN_STATE_PRESSED
 
-#endif // BTN_DATA_MASKS_H
+#endif // BTN_CONFIG_H

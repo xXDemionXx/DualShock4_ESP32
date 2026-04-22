@@ -1,5 +1,5 @@
-#include "ds4_polling.h"
 #include "ds4_receive_type.h"
+#include "ds4_polling.h"
 #include <string.h>
 
 static ds4_data_t *data_p = NULL;

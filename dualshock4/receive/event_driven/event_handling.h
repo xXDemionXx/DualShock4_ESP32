@@ -1,10 +1,8 @@
-#ifndef DS4_EVENT_HANDLING_H
-#define DS4_EVENT_HANDLING_H
+#ifndef EVENT_HANDLING_H
+#define EVENT_HANDLING_H
 
 #include "ds4_receive_type.h"
-
 #include "freertos/FreeRTOS.h"
-//#include "freertos/queue.h"
 
 /**
  * @brief Sends controller data to the event handler
@@ -24,4 +22,4 @@ void ds4_suspend_buttons_event_handler();
  */
 void ds4_resume_buttons_event_handler();
 
-#endif
+#endif  // EVENT_HANDLING_H

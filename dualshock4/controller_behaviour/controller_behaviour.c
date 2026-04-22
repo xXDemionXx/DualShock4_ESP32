@@ -1,13 +1,11 @@
-#include "dualshock4_initializer.h"
-#include "dualshock4_connection_status_modify.h"
-#include "ds4_polling.h"
-
-#include "uni.h"
-#include "dualshock4_connection_status_modify.h"
 #include <stdatomic.h>
+#include "controller_behaviour.h"
+#include "connection_status_modify.h"
+#include "ds4_polling.h"
+#include "uni.h"
 
 #ifdef CONFIG_DS4_MODE_EVENT
-#include "ds4_event_handling.h"
+#include "event_handling.h"
 #endif
 
 // Private defines

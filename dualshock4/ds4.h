@@ -1,16 +1,13 @@
-// This is the API that you use to use the controller
-
 #ifndef DUALSHOCK4_H
 #define DUALSHOCK4_H
 
-#include "dualshock4_initializer.h"
-#include "ds4_polling.h"
+#include <stdbool.h>
 #include "ds4_receive_type.h"
-#include "dualshock4_connection_status_modify.h"
+#include "ds4_connection_status.h"
 
 #ifdef CONFIG_DS4_MODE_EVENT
-#include "btn_events.h"
-#include "ds4_event_handling_init.h"
+#include "ds4_btns.h"
+#include "ds4_btn_events.h"
 #endif
 
 // Defines
@@ -33,7 +30,6 @@ typedef enum
     DS4_COMMAND_SEND_FAIL_NO_CONTROLLER,
     DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT
 } ds4_command_send_e;
-
 
 // Callable functions
 

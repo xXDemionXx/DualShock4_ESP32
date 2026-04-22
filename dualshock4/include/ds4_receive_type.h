@@ -1,5 +1,5 @@
-#ifndef DS4_RECEIVE_TYPES_H
-#define DS4_RECEIVE_TYPES_H
+#ifndef DS4_RECEIVE_TYPE_H
+#define DS4_RECEIVE_TYPE_H
 
 #include <stdint.h>
 
@@ -70,4 +70,4 @@ typedef struct
 
 } ds4_data_t;
 
-#endif
+#endif  // DS4_RECEIVE_TYPE_H

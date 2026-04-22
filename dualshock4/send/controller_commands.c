@@ -1,5 +1,5 @@
 #include "btstack_defines.h"
-#include "dualshock4_initializer.h"
+#include "controller_behaviour.h"
 #include "controller_commands.h"
 
 void ds4_lightbar_callback(void *p_parameter)

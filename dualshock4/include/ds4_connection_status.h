@@ -1,0 +1,12 @@
+#ifndef DS4_CONNECTION_STATUS_H
+#define DS4_CONNECTION_STATUS_H
+
+typedef enum
+{
+    DS4_READY,
+    DS4_CONNECTED,
+    DS4_DISCONNECTING,
+    DS4_DISCONNECTED
+} ds4_connection_status_e;
+
+#endif // DS4_CONNECTION_STATUS_H

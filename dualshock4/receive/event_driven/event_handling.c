@@ -1,11 +1,12 @@
-#include "ds4_event_handling.h"
-#include "ds4_btn_event_handling_settings.h"
-#include "btns.h"
-#include "btn_events.h"
+#include "event_handling.h"
+#include "btn_event_handling_settings.h"
+#include "ds4_btns.h"
+#include "ds4_btn_events.h"
 #include "ds4_receive_type.h"
 #include "ds4_event_handling_init.h"
-#include "ds4_btn_config.h"
-#include "btn_events.h"
+#include "btn_config.h"
+#include "ds4_btn_events.h"
+#include "btn_event_masks.h"
 #include "freertos/queue.h"
 #include <stdint.h>
 #include <string.h>
@@ -192,7 +193,6 @@ static inline ds4_btn_event_e event_check_btn_press(uint8_t state, uint8_t prev_
         return DS4_BTN_EVENT_PRESS;
     else{
         return DS4_BTN_EVENT_NO_EVENT;
-        // vTaskDelay(pdTICKS_TO_MS(1000));
     }
 }
 

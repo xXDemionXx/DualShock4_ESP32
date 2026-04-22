@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_COMMANDS_H
 #define CONTROLLER_COMMANDS_H
 
-#include "dualshock4_initializer.h"
+#include "controller_behaviour.h"
 #include <stdint.h>
 
 // Public types

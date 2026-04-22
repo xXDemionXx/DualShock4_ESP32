@@ -1,5 +1,5 @@
-#ifndef BTNS_H
-#define BTNS_H
+#ifndef DS4_BTNS_H
+#define DS4_BTNS_H
 
 typedef enum
 {
