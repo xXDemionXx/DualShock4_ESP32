@@ -11,22 +11,19 @@
 #include "uni_version.h"
 #include <string.h>
 
-
 // Private variables
 
 static btstack_context_callback_registration_t callback_registration;
 static ds4_command_t commands[DS4_NUM_OF_COMMAND_TYPES] = {0}; // An array that is used for storing data of each command type
-
 
 // Private function prototypes
 
 static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC);
 static ds4_init_e ds4_bluepad32_init(void);
 
-
 // Public functions
 
-ds4_init_e ds4Init(const char *MAC)
+ds4_init_e ds4Init()
 {
     // If you enable HCI Dump better to disable "Bluepad32 USB Console" from "idf.py menuconfig".
 
@@ -37,18 +34,18 @@ ds4_init_e ds4Init(const char *MAC)
 #endif // CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
 #endif // CONFIG_ESP_CONSOLE_UART
 
-    if (MAC != NULL)    // If user provides a MAC address use it for Bluetooth
+#ifdef CONFIG_DS4_BT_MAC_CUSTOM
+    // If user provides a MAC address use it for Bluetooth
+    bd_addr_t addr;
+    if (string_to_MAC(CONFIG_DS4_BT_CUSTOM_MAC_STRING, &addr) == true)
+        esp_iface_mac_addr_set(addr, ESP_MAC_BT);
+    else
     {
-        bd_addr_t addr;
-        if (string_to_MAC(MAC, &addr) == true)
-            esp_iface_mac_addr_set(addr, ESP_MAC_BT);
-        else
-        {
-            ESP_LOGE("DS4_init",
-                     "Invalid MAC string provided\nExpected formating - \"XX:XX:XX:XX:XX:XX\" where XX is HEX value in range from 00 to FF");
-            return DS4_INIT_BAD_MAC;
-        }
-    }   // If user passes NULL, the default Bluetooth MAC will be used
+        ESP_LOGE("DS4_init",
+                 "Invalid Bluetooth MAC string provided\nExpected formating - \"XX:XX:XX:XX:XX:XX\" where XX is HEX value in range from 00 to FF");
+        return DS4_INIT_BAD_BLUETOOTH_MAC;
+    }
+#endif
 
     // Configure BTstack for ESP32 VHCI Controller
     if (btstack_init() != 0)
@@ -331,8 +328,27 @@ static ds4_init_e ds4_bluepad32_init(void)
     // Continue with bluetooth setup.
     if (uni_bt_setup() != 0)
         return DS4_INIT_BLUEPAD_INIT_FAILED;
+
+#ifdef CONFIG_DS4_CONNECT_TO_SPECIFIC_MAC
     uni_bt_allowlist_init();
+    bd_addr_t addr;
+    if (string_to_MAC(CONFIG_DS4_BT_CUSTOM_MAC_STRING, &addr) == true)
+        // If the address isn't on the list remove the previous and add this one
+        if (uni_bt_allowlist_is_allowed_addr(addr) != true)
+        {
+            uni_bt_allowlist_remove_all();
+            esp_iface_mac_addr_set(addr, ESP_MAC_BT);
+        }
+        else
+        {
+            ESP_LOGE("DS4_init",
+                     "Invalid controller MAC string provided\nExpected formating - \"XX:XX:XX:XX:XX:XX\" where XX is HEX value in range from 00 to FF");
+            return DS4_INIT_BAD_CONTROLLER_MAC;
+        }
+    uni_bt_allowlist_add_addr(addr);
     uni_bt_allowlist_set_enabled(true);
+#endif
+
     // uni_virtual_device_init();   // No virtual device (touchpad) for now
 
     return 0;

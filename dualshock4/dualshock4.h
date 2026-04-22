@@ -22,7 +22,8 @@
 typedef enum
 {
     DS4_INIT_SUCCES,
-    DS4_INIT_BAD_MAC,
+    DS4_INIT_BAD_BLUETOOTH_MAC,
+    DS4_INIT_BAD_CONTROLLER_MAC,
     DS4_INIT_BTSTACK_INIT_FAILED,
     DS4_INIT_BLUEPAD_INIT_FAILED,
     DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_FAILED,
@@ -42,14 +43,9 @@ void ds4_run_loop(void);
 /**
  * @brief Sets up everything needed for ds4 before we can connect
  *
- * @param MAC String literal MAC of format "XX:XX:XX:XX:XX:XX"
- *      The MAC address on which we will be, set it to the address
- *      that is stored on the controller you want to connect to.
- *      If you pass in NULL the default Bluetooth MAC will be used
- *      which depends on your chip.
  * @return With what state did the initialization exit.
  */
-ds4_init_e ds4Init(const char *MAC);
+ds4_init_e ds4Init();
 
 /**
  * @brief Set the RGB value of the lightbar
