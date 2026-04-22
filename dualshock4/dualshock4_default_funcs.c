@@ -34,20 +34,22 @@ void ds4_on_init(int argc, const char **argv)
 
     uni_gamepad_set_mappings(&mappings);
 #endif
-    //    uni_bt_service_set_enabled(true);
 }
 
 void ds4_on_init_complete(void)
 {
     logi(DUALSHOCK4_DEFAULT_NAME ": on_init_complete()\n");
 
+    uni_bt_del_keys_unsafe();
+
+#ifdef CONFIG_DS4_AUTOCONNECT_MODE
     uni_bt_start_scanning_and_autoconnect_unsafe();
     uni_bt_allow_incoming_connections(true);
+#endif
 
-    if (1)
-        uni_bt_del_keys_unsafe();
-    else
-        uni_bt_list_keys_unsafe();
+#ifdef CONFIG_DS4_CONNECT_TO_SPECIFIC_MAC
+    uni_bt_allow_incoming_connections(true);
+#endif
 }
 
 uni_error_t ds4_on_device_discovered(bd_addr_t addr, const char *name, uint16_t cod, uint8_t rssi)
@@ -66,8 +68,14 @@ void ds4_on_device_connected(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_CONNECTED);
 
+#ifdef CONFIG_DS4_AUTOCONNECT_MODE
     uni_bt_stop_scanning_unsafe();
     uni_bt_allow_incoming_connections(false);
+#endif
+
+#ifdef CONFIG_DS4_CONNECT_TO_SPECIFIC_MAC
+    uni_bt_allow_incoming_connections(false);
+#endif
 
 #ifdef CONFIG_DS4_MODE_EVENT
     ds4_resume_buttons_event_handler();
@@ -80,8 +88,14 @@ void ds4_on_device_disconnected(uni_hid_device_t *d)
 {
     set_ds4_connection_status(DS4_DISCONNECTED);
 
+#ifdef CONFIG_DS4_AUTOCONNECT_MODE
     uni_bt_start_scanning_and_autoconnect_unsafe();
     uni_bt_allow_incoming_connections(true);
+#endif
+
+#ifdef CONFIG_DS4_CONNECT_TO_SPECIFIC_MAC
+    uni_bt_allow_incoming_connections(true);
+#endif
 
 #ifdef CONFIG_DS4_MODE_EVENT
     ds4_suspend_buttons_event_handler();

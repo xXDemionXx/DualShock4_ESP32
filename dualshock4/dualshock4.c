@@ -332,19 +332,21 @@ static ds4_init_e ds4_bluepad32_init(void)
 #ifdef CONFIG_DS4_CONNECT_TO_SPECIFIC_MAC
     uni_bt_allowlist_init();
     bd_addr_t addr;
-    if (string_to_MAC(CONFIG_DS4_BT_CUSTOM_MAC_STRING, &addr) == true)
+    if (string_to_MAC(CONFIG_DS4_CONTROLLER_MAC_STRING, &addr) == true)
+    {
         // If the address isn't on the list remove the previous and add this one
         if (uni_bt_allowlist_is_allowed_addr(addr) != true)
         {
             uni_bt_allowlist_remove_all();
             esp_iface_mac_addr_set(addr, ESP_MAC_BT);
         }
-        else
-        {
-            ESP_LOGE("DS4_init",
-                     "Invalid controller MAC string provided\nExpected formating - \"XX:XX:XX:XX:XX:XX\" where XX is HEX value in range from 00 to FF");
-            return DS4_INIT_BAD_CONTROLLER_MAC;
-        }
+    }
+    else
+    {
+        ESP_LOGE("DS4_init",
+                 "Invalid controller MAC string provided\nExpected formating - \"XX:XX:XX:XX:XX:XX\" where XX is HEX value in range from 00 to FF");
+        return DS4_INIT_BAD_CONTROLLER_MAC;
+    }
     uni_bt_allowlist_add_addr(addr);
     uni_bt_allowlist_set_enabled(true);
 #endif
