@@ -1,10 +1,10 @@
-#ifndef DUALSHOCK4_INITIALIZER_H
-#define DUALSHOCK4_INITIALIZER_H
+#ifndef CONTROLLER_BEHAVIOUR_H
+#define CONTROLLER_BEHAVIOUR_H
 
 #include <btstack_port_esp32.h>
-#include <uni.h>
 #include "sdkconfig.h" // We need to see CONFIG_BLUEPAD32_PLATFORM_CUSTOM
-//
+#include "uni_hid_device.h"
+#include "platform/uni_platform.h"
 
 // Only custom platform is allowed
 #ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
@@ -30,4 +30,4 @@ typedef struct platform_instance_s
 // Function prototypes
 ds4_platform_handle get_ds4_platform(void);
 
-#endif // DUALSHOCK4_INITIALIZER_H
+#endif // CONTROLLER_BEHAVIOUR_H

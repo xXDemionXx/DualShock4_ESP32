@@ -2,7 +2,10 @@
 #include "controller_behaviour.h"
 #include "connection_status_modify.h"
 #include "ds4_polling.h"
-#include "uni.h"
+#include "uni_log.h"
+#include "uni_hid_device.h"
+#include "bt/uni_bt.h"
+#include "bt/uni_bt_defines.h"
 
 #ifdef CONFIG_DS4_MODE_EVENT
 #include "event_handling.h"

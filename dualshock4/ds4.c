@@ -2,11 +2,19 @@
 #include "controller_behaviour.h"
 #include "connection_status_modify.h"
 #include "controller_commands.h"
-#include "event_handling.h"
-#include "ds4_event_handling_init.h"
 #include "esp_mac.h"
 #include "esp_log.h"
 #include "uni_version.h"
+#include "uni_log.h"
+#include "bt/uni_bt.h"
+#include "bt/uni_bt_defines.h"
+#include "bt/uni_bt_allowlist.h"
+#include "bt/uni_bt_setup.h"
+
+#ifdef CONFIG_DS4_MODE_EVENT
+#include "event_handling.h"
+#include "ds4_event_handling_init.h"
+#endif
 
 // Private variables
 
@@ -19,6 +27,12 @@ static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC);
 static ds4_init_e ds4_bluepad32_init(void);
 
 // Public functions
+
+void ds4_run_loop(void)
+{
+    // Does not return.
+    btstack_run_loop_execute();
+}
 
 ds4_init_e ds4Init()
 {
@@ -62,6 +76,15 @@ ds4_init_e ds4Init()
 #endif
 
     return DS4_INIT_SUCCESS;
+}
+
+void ds4Disconnect(void)
+{
+    if (ds4GetConnectionStatus() == DS4_READY)
+    {
+        set_ds4_connection_status(DS4_DISCONNECTING);
+        uni_bt_disconnect_device_safe(DS4_DEVICE_IDX);
+    }
 }
 
 ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
@@ -193,49 +216,11 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
     return DS4_COMMAND_SEND_SUCCESS;
 }
 
-void ds4Disconnect(void)
-{
-    if (ds4GetConnectionStatus() == DS4_READY)
-    {
-        set_ds4_connection_status(DS4_DISCONNECTING);
-        uni_bt_disconnect_device_safe(DS4_DEVICE_IDX);
-    }
-}
-
 void ds4GetUserAddress(char buffer[18])
 {
     bd_addr_t addr;
     gap_local_bd_addr(addr);
     snprintf(buffer, 18, "%02X:%02X:%02X:%02X:%02X:%02X", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
-}
-
-bool ds4AllowDevice(const char *MAC_string)
-{
-    bd_addr_t addr;
-    if (string_to_MAC(MAC_string, &addr))
-    {
-        if (uni_bt_allowlist_add_addr(addr) == true)
-        {
-            uni_bt_allowlist_set_enabled(true); // If not allready enabled
-            return true;
-        }
-        else
-            return false;
-    }
-    else
-        return false;
-}
-
-void ds4UnallowDevices(void)
-{
-    uni_bt_allowlist_remove_all();
-    uni_bt_allowlist_set_enabled(false);
-}
-
-void ds4_run_loop(void)
-{
-    // Does not return.
-    btstack_run_loop_execute();
 }
 
 // Private functions

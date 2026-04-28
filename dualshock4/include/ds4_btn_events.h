@@ -16,4 +16,4 @@ typedef enum{
     DS4_BTN_EVENT_NO_EVENT = 0xFF   // Sentinal value used to indicate no event was found
 } ds4_btn_event_e;
 
-#endif  // BTN_EVENTS_H
+#endif  // DS4_BTN_EVENTS_H
