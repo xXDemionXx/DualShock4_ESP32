@@ -11,6 +11,7 @@
 #include <string.h>
 
 // Defines
+
 #define KB_TO_B(x) x * 1024
 #define DS4_BTN_EVENT_TASK_SIZE 3 // In kB
 #define DS4_BTN_EVENT_TASK_NAME "DS4 buttons event handler"

@@ -1,7 +1,19 @@
 menu "DualShock4 Configuration"
 
+    config DS4_ENABLE
+        bool "Enable DS4"
+        select BT_ENABLED
+        select BT_BLUEDROID_ENABLED
+        select BLUEDROID_PINNED_TO_CORE_0
+        select BT_BREDR_ENABLED
+        select BT_CLASSIC_ENABLED
+        select BT_CONTROLLER_ENABLED
+        select BLUEPAD32_PLATFORM_CUSTOM
+
+
     choice DS4_MODE
         prompt "DualShock4 operation mode"
+        depends on DS4_ENABLE
         default DS4_MODE_EVENT
         help
             Will you only be using polling or
@@ -12,12 +24,13 @@ menu "DualShock4 Configuration"
 
     config DS4_MODE_ONLY_POLLING
         bool "Just polling"
-
+        
     endchoice
 
 
     choice DS4_BT_MAC_MODE
         prompt "Bluetooth MAC Address Mode"
+        depends on DS4_ENABLE
         default DS4_BT_MAC_DEFAULT
 
     config DS4_BT_MAC_DEFAULT
@@ -39,6 +52,7 @@ menu "DualShock4 Configuration"
     
     choice DS4_CONTROLLER_CONNECT_MODE
         prompt "Controller connect mode"
+        depends on DS4_ENABLE
         default DS4_AUTOCONNECT_MODE
 
     config DS4_AUTOCONNECT_MODE

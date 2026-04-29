@@ -4,29 +4,12 @@
 #include <stdbool.h>
 #include "ds4_receive_type.h"
 #include "ds4_connection_status.h"
-
 #ifdef CONFIG_DS4_MODE_EVENT
 #include "ds4_btns.h"
 #include "ds4_btn_events.h"
 #endif
 
-// Defines
-
-#define DS4_SETUP_TASK_PRIORITY     15
-#define DS4_BUTTONS_EVENT_HANDLER_TASK_PRIORITY     10
-
 // Types
-
-typedef enum
-{
-    DS4_INIT_SUCCESS,
-    DS4_INIT_BAD_BLUETOOTH_MAC,
-    DS4_INIT_BAD_CONTROLLER_MAC,
-    DS4_INIT_BTSTACK_INIT_FAILED,
-    DS4_INIT_BLUEPAD_INIT_FAILED,
-    DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_INIT_FAILED,
-    DS4_INIT_BTSTACK_RUN_LOOP_TASK_INIT_FAILED
-} ds4_init_e;
 
 typedef enum
 {
@@ -143,7 +126,7 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
 
 /**
  * @brief Fills your buffer with the MAC string which this device uses.
- * 
+ *
  * @note This is just a utility if you don't know your ESP's address,
  *       or you want to make sure you changed it to the correct one.
  */

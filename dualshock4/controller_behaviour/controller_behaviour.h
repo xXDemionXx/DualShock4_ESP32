@@ -8,11 +8,11 @@
 
 // Only custom platform is allowed
 #ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
-#error "Must use BLUEPAD32_PLATFORM_CUSTOM"
+#error "DS4 library requires Bluepad32 platform set to CUSTOM"
 #endif
 
 #ifndef CONFIG_BT_ENABLED
-#error "Enable Bluetooth in sdkconfig!"
+#error "DS4 library requires Bluetooth to be enabled"
 #endif
 
 #define DS4_DEVICE_IDX 0 // Only one device at any time allowed so the ID
