@@ -10,6 +10,11 @@
 #include "ds4_btn_events.h"
 #endif
 
+// Defines
+
+#define DS4_SETUP_TASK_PRIORITY     15
+#define DS4_BUTTONS_EVENT_HANDLER_TASK_PRIORITY     10
+
 // Types
 
 typedef enum
@@ -20,6 +25,7 @@ typedef enum
     DS4_INIT_BTSTACK_INIT_FAILED,
     DS4_INIT_BLUEPAD_INIT_FAILED,
     DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_INIT_FAILED,
+    DS4_INIT_BTSTACK_RUN_LOOP_TASK_INIT_FAILED
 } ds4_init_e;
 
 typedef enum
@@ -31,14 +37,10 @@ typedef enum
 
 // Callable functions
 
-void ds4_run_loop(void);
-
 /**
  * @brief Sets up everything needed for ds4 before we can connect.
- *
- * @return With what state did the initialization exit.
  */
-ds4_init_e ds4Init();
+void ds4Init();
 
 /**
  * @brief Pass the pointer to your ds4_data_t variable that you can use to access button values.
@@ -70,7 +72,7 @@ void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger
  *
  * @return Connection status.
  *         Possible states are: ready, connected, disconnecting, disconnected.
- * 
+ *
  * @note Interact with the controller only when it is in the "ready" state.
  */
 ds4_connection_status_e ds4GetConnectionStatus(void);
@@ -141,6 +143,9 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
 
 /**
  * @brief Fills your buffer with the MAC string which this device uses.
+ * 
+ * @note This is just a utility if you don't know your ESP's address,
+ *       or you want to make sure you changed it to the correct one.
  */
 void ds4GetUserAddress(char buffer[18]);
 

@@ -1,5 +1,4 @@
 #include "event_handling.h"
-#include "btn_event_handling_settings.h"
 #include "ds4_btns.h"
 #include "ds4_btn_events.h"
 #include "ds4_receive_type.h"
@@ -11,7 +10,11 @@
 #include <stdint.h>
 #include <string.h>
 
-// Helper
+// Defines
+#define KB_TO_B(x) x * 1024
+#define DS4_BTN_EVENT_TASK_SIZE 3 // In kB
+#define DS4_BTN_EVENT_TASK_NAME "DS4 buttons event handler"
+#define DS4_BTN_EVENT_TASK_PRIORITY 10
 #define DS4_BTN_EVENT_MASK_FROM_EVENT(event) (1 << event)
 
 /**
@@ -64,7 +67,6 @@ static inline ds4_btn_event_e event_check_btn_press(uint8_t state, uint8_t prev_
 static inline ds4_btn_event_e event_check_btn_release(uint8_t state, uint8_t prev_state);
 static inline void trigger_event_function(uint8_t found_event, btn_event_settings_s *settings);
 
-
 // Public functions
 
 BaseType_t ds4_send_data_to_event_handler(ds4_data_t *data)
@@ -78,10 +80,12 @@ BaseType_t ds4_send_data_to_event_handler(ds4_data_t *data)
 
 void ds4_suspend_buttons_event_handler()
 {
-    if (task_handle != NULL){
+    if (task_handle != NULL)
+    {
         vTaskSuspend(task_handle);
         // Reset the button states
-        for(uint8_t current_button = 0; current_button < DS4_NUM_OF_BUTTONS; current_button++){
+        for (uint8_t current_button = 0; current_button < DS4_NUM_OF_BUTTONS; current_button++)
+        {
             buttons[current_button].states.current_state = DS4_BTN_STATE_RELEASED;
             buttons[current_button].states.prev_state = DS4_BTN_STATE_RELEASED;
         }
@@ -104,7 +108,7 @@ ds4_event_handling_init_e ds4_init_buttons_event_handler()
     }
 
     // Create the event handler task
-    if (pdPASS != xTaskCreate(&event_handler_task, DS4_BTN_EVENT_TASK_NAME, NUM_TO_KB(DS4_BTN_EVENT_TASK_SIZE), &queue_handle, DS4_BTN_EVENT_TASK_PRIORITY, &task_handle))
+    if (pdPASS != xTaskCreate(&event_handler_task, DS4_BTN_EVENT_TASK_NAME, KB_TO_B(DS4_BTN_EVENT_TASK_SIZE), &queue_handle, DS4_BTN_EVENT_TASK_PRIORITY, &task_handle))
     {
         return DS4_INIT_EVENT_TASK_FAILED;
     }
@@ -123,7 +127,6 @@ void ds4SetButtonEvent(btn_e button, const ds4_btn_event_e event, void (*trigger
     // Cleanup from before if something in states was left
     memset(&buttons[button].states, 0, sizeof(buttons[button].states));
 }
-
 
 // Private functions
 
@@ -191,7 +194,8 @@ static inline ds4_btn_event_e event_check_btn_press(uint8_t state, uint8_t prev_
 {
     if (prev_state == DS4_BTN_STATE_RELEASED && state == DS4_BTN_STATE_PRESSED)
         return DS4_BTN_EVENT_PRESS;
-    else{
+    else
+    {
         return DS4_BTN_EVENT_NO_EVENT;
     }
 }

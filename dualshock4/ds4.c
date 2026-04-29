@@ -10,11 +10,24 @@
 #include "bt/uni_bt_defines.h"
 #include "bt/uni_bt_allowlist.h"
 #include "bt/uni_bt_setup.h"
+#include <stdbool.h>
 
 #ifdef CONFIG_DS4_MODE_EVENT
 #include "event_handling.h"
 #include "ds4_event_handling_init.h"
 #endif
+
+// Defines
+
+#define KB_TO_B(x) x * 1024
+#define DS4_INIT_TASK_SIZE 5 // In kB
+#define DS4_INIT_TASK_NAME "DS4 init"
+#define DS4_INIT_TASK_PRIORITY 10
+#define DS4_INIT_TASK_CORE  CONFIG_BT_BLUEDROID_PINNED_TO_CORE
+
+// Private constants
+
+static const char *TAG_DS4_Init = "DS4_Init";
 
 // Private variables
 
@@ -23,59 +36,19 @@ static ds4_command_t commands[DS4_NUM_OF_COMMAND_TYPES] = {0}; // An array that 
 
 // Private function prototypes
 
+static void ds4_init_task(void *p_parameter);
 static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC);
-static ds4_init_e ds4_bluepad32_init(void);
+static bool ds4_bluepad32_init(void);
 
 // Public functions
 
-void ds4_run_loop(void)
+void ds4Init()
 {
-    // Does not return.
-    btstack_run_loop_execute();
-}
-
-ds4_init_e ds4Init()
-{
-    // If you enable HCI Dump better to disable "Bluepad32 USB Console" from "idf.py menuconfig".
-
-    // Don't use BTstack buffered UART. It conflicts with the console.
-#ifdef CONFIG_ESP_CONSOLE_UART
-#ifndef CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
-    btstack_stdio_init();
-#endif // CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
-#endif // CONFIG_ESP_CONSOLE_UART
-
-#ifdef CONFIG_DS4_BT_MAC_CUSTOM
-    // If user provides a MAC address use it for Bluetooth
-    bd_addr_t addr;
-    if (string_to_MAC(CONFIG_DS4_BT_CUSTOM_MAC_STRING, &addr) == true)
-        esp_iface_mac_addr_set(addr, ESP_MAC_BT);
-    else
+    if (pdPASS != xTaskCreatePinnedToCore(&ds4_init_task, DS4_INIT_TASK_NAME, KB_TO_B(DS4_INIT_TASK_SIZE), NULL, DS4_INIT_TASK_PRIORITY, NULL, DS4_INIT_TASK_CORE))
     {
-        ESP_LOGE("DS4_init",
-                 "Invalid Bluetooth MAC string provided\nExpected formating - \"XX:XX:XX:XX:XX:XX\" where XX is HEX value in range from 00 to FF");
-        return DS4_INIT_BAD_BLUETOOTH_MAC;
+        ESP_LOGE(TAG_DS4_Init, "Init task creation failed.");
+        ESP_ERROR_CHECK(ESP_FAIL);
     }
-#endif
-
-    // Configure BTstack for ESP32 VHCI Controller
-    if (btstack_init() != 0)
-        return DS4_INIT_BTSTACK_INIT_FAILED;
-
-    // Init Bluepad32
-    if (ds4_bluepad32_init() != 0)
-        return DS4_INIT_BLUEPAD_INIT_FAILED;
-
-    // uni_bt_allowlist_remove_all();
-
-#ifdef CONFIG_DS4_MODE_EVENT
-    ds4_event_handling_init_e buttons_event_handler_init_error;
-    buttons_event_handler_init_error = ds4_init_buttons_event_handler();
-    if (buttons_event_handler_init_error != DS4_INIT_EVENT_SUCCES)
-        return DS4_INIT_BUTTONS_EVENT_HANDLER_TASK_INIT_FAILED;
-#endif
-
-    return DS4_INIT_SUCCESS;
 }
 
 void ds4Disconnect(void)
@@ -225,6 +198,47 @@ void ds4GetUserAddress(char buffer[18])
 
 // Private functions
 
+// We need to use a seperate task that initializes Btstack and runs it's loop
+static void ds4_init_task(void *p_parameter)
+{
+    // If you enable HCI Dump better to disable "Bluepad32 USB Console" from "idf.py menuconfig".
+
+    // Don't use BTstack buffered UART. It conflicts with the console.
+#ifdef CONFIG_ESP_CONSOLE_UART
+#ifndef CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
+    btstack_stdio_init();
+#endif // CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE
+#endif // CONFIG_ESP_CONSOLE_UART
+
+#ifdef CONFIG_DS4_BT_MAC_CUSTOM
+    // If user provides a MAC address use it for Bluetooth
+    bd_addr_t addr;
+    if (string_to_MAC(CONFIG_DS4_BT_CUSTOM_MAC_STRING, &addr) == true)
+        esp_iface_mac_addr_set(addr, ESP_MAC_BT);
+    else
+    {
+        ESP_LOGE(TAG_DS4_Init,
+                 "Invalid Bluetooth MAC string provided\nExpected formating - \"XX:XX:XX:XX:XX:XX\" where XX is HEX value in range from 00 to FF");
+        ESP_ERROR_CHECK(ESP_FAIL);
+    }
+#endif
+
+    btstack_init();
+
+    ds4_bluepad32_init();
+
+#ifdef CONFIG_DS4_MODE_EVENT
+    if (ds4_init_buttons_event_handler() != DS4_INIT_EVENT_SUCCES)
+    {
+        ESP_LOGE(TAG_DS4_Init, "Buttons event handler init fail.");
+        ESP_ERROR_CHECK(ESP_FAIL);
+    }
+#endif
+
+    // run loop needs to run in the same task context as btstack_init()
+    btstack_run_loop_execute(); // Does not return
+}
+
 // MAC is the return array
 // Returns false if formating error
 static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC)
@@ -281,9 +295,9 @@ static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC)
     return true;
 }
 
-static ds4_init_e ds4_bluepad32_init(void)
+// Returns true if successful
+static bool ds4_bluepad32_init(void)
 {
-
     // Get pointer to a struct containing all functions for the platform
     // Then set that struct for uni platform
     uni_platform_set_custom(get_ds4_platform());
@@ -305,7 +319,7 @@ static ds4_init_e ds4_bluepad32_init(void)
 
     // Continue with bluetooth setup.
     if (uni_bt_setup() != 0)
-        return DS4_INIT_BLUEPAD_INIT_FAILED;
+        return false;
 
 #ifdef CONFIG_DS4_CONNECT_TO_SPECIFIC_MAC
     uni_bt_allowlist_init();
@@ -321,9 +335,10 @@ static ds4_init_e ds4_bluepad32_init(void)
     }
     else
     {
-        ESP_LOGE("DS4_init",
+        ESP_LOGE(TAG_DS4_Init,
                  "Invalid controller MAC string provided\nExpected formating - \"XX:XX:XX:XX:XX:XX\" where XX is HEX value in range from 00 to FF");
-        return DS4_INIT_BAD_CONTROLLER_MAC;
+        ESP_ERROR_CHECK(ESP_FAIL);
+        return false;
     }
     uni_bt_allowlist_add_addr(addr);
     uni_bt_allowlist_set_enabled(true);
@@ -331,5 +346,5 @@ static ds4_init_e ds4_bluepad32_init(void)
 
     // uni_virtual_device_init();   // No virtual device (touchpad) for now
 
-    return 0;
+    return true;
 }

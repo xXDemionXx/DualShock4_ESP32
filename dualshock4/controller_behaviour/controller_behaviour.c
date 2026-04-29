@@ -11,11 +11,10 @@
 #include "event_handling.h"
 #endif
 
-// Private defines
+// Defines
 
-#define DUALSHOCK4_DEFAULT_NAME "dualshock4" // Name of the controller (prefixes it's messages to the console)
+#define DUALSHOCK4_DEFAULT_NAME "DS4" // Name of the controller (prefixes it's messages to the console)
 #define DS4_DEFAULT_SEAT GAMEPAD_SEAT_A
-
 
 // Private function prototypes
 
