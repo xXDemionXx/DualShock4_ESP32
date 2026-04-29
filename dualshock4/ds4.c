@@ -11,7 +11,6 @@
 #include "bt/uni_bt_allowlist.h"
 #include "bt/uni_bt_setup.h"
 #include <stdbool.h>
-
 #ifdef CONFIG_DS4_MODE_EVENT
 #include "event_handling.h"
 #include "ds4_event_handling_init.h"
@@ -23,7 +22,11 @@
 #define DS4_INIT_TASK_SIZE 5 // In kB
 #define DS4_INIT_TASK_NAME "DS4 init"
 #define DS4_INIT_TASK_PRIORITY 10
+#ifdef CONFIG_BT_BLUEDROID_PINNED_TO_CORE
 #define DS4_INIT_TASK_CORE  CONFIG_BT_BLUEDROID_PINNED_TO_CORE
+#else 
+#define DS4_INIT_TASK_CORE 0
+#endif
 
 // Private constants
 

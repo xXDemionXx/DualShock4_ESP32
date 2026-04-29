@@ -14,6 +14,7 @@ set(priv_includes
             "receive/polling"
             "controller_behaviour"
             "send"
+            "util"
             )
 
 if(CONFIG_DS4_MODE_EVENT)
