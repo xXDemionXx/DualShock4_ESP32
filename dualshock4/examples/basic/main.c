@@ -1,3 +1,5 @@
+// This example shows how to setup the basic polling aproach.
+//
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
@@ -28,7 +30,7 @@ int app_main(void)
             // if the data actually is 0 or it is unknown.
             print_data(&data);
 
-            // Your application logic can replace the print function
+            // Your application logic can replace the print function or it can run in a different task
             //
             // application_logic();
             //

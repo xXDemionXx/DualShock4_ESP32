@@ -1,3 +1,7 @@
+// This example prints out the MAC address set as your bluetooth MAC.
+// If "Bluetooth MAC Address Mode" is set to "Use custom Bluetooth MAC"
+// you will just read the address that you wrote.
+//
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
