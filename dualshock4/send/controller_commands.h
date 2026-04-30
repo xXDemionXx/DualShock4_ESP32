@@ -45,7 +45,6 @@ typedef union
 typedef struct
 {
     ds4_command_execution_status status; ///>
-    ds4_device_handle device;            ///> Handle of the device to which the command will be sent
     ds4_command_data_t data;             ///> The payload
 } ds4_command_t;
 

@@ -116,7 +116,7 @@ bool ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_de
 bool ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay);
 
 /**
- * @brief Fills your buffer with the MAC string which this device uses.
+ * @brief Fills your buffer (size of 18 chars) with the MAC string which this device uses.
  *
  * @note This is just a utility if you don't know your ESP's address,
  *       or you want to make sure you changed it to the correct one.
