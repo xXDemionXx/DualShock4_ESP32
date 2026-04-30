@@ -9,15 +9,6 @@
 #include "ds4_btn_events.h"
 #endif
 
-// Types
-
-typedef enum
-{
-    DS4_COMMAND_SEND_SUCCESS,
-    DS4_COMMAND_SEND_FAIL_NO_CONTROLLER,
-    DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT
-} ds4_command_send_e;
-
 // Callable functions
 
 /**
@@ -71,9 +62,9 @@ void ds4Disconnect(void);
 /**
  * @brief Set the RGB value of the lightbar.
  *
- * @return Error code.
+ * @return True if command sent successfully.
  */
-ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B);
+bool ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B);
 
 /**
  * @brief Play rumble on the controller.
@@ -83,9 +74,9 @@ ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B);
  * @param magnitude How strong should the rumble be (0-255).
  * @param duration How long the rumble will last in ms.
  * @param start_delay After what time after receiving will the rumble start in ms.
- * @return Error code.
+ * @return True if command sent successfully.
  */
-ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t start_delay);
+bool ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t start_delay);
 
 /**
  * @brief Play weak rumble on the controller.
@@ -95,9 +86,9 @@ ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t 
  * @param magnitude How strong should the rumble be (0-255).
  * @param duration How long the rumble will last in ms.
  * @param start_delay After what time after receiving will the rumble start in ms.
- * @return Error code.
+ * @return True if command sent successfully.
  */
-ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint16_t start_delay);
+bool ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint16_t start_delay);
 
 /**
  * @brief Play weak rumble on the controller.
@@ -107,9 +98,9 @@ ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint1
  * @param magnitude How strong should the rumble be (0-255).
  * @param duration How long the rumble will last in ms.
  * @param start_delay After what time after receiving will the rumble start in ms.
- * @return Error code.
+ * @return True if command sent successfully.
  */
-ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_delay);
+bool ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_delay);
 
 /**
  * @brief Play weak rumble on the controller.
@@ -120,9 +111,9 @@ ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uin
  * @param magnitude_strong How strong should the rumble be on the strong motor (0-255).
  * @param duration How long the rumble will last in ms.
  * @param start_delay After what time after receiving will the rumble start in ms.
- * @return Error code.
+ * @return True if command sent successfully.
  */
-ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay);
+bool ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay);
 
 /**
  * @brief Fills your buffer with the MAC string which this device uses.

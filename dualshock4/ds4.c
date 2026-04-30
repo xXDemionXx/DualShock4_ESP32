@@ -63,17 +63,17 @@ void ds4Disconnect(void)
     }
 }
 
-ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
+bool ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
 {
     ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
 
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
-        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+        return false;
 
     // The callback sets the command status to AVAILABLE when it is done sending
     if (commands[DS4_COMMAND_LIGHTBAR].status == DS4_COMMAND_STATUS_UNAVAILABLE)
-        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
+        return false;
 
     commands[DS4_COMMAND_LIGHTBAR].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
     commands[DS4_COMMAND_LIGHTBAR].device = ds4;
@@ -85,20 +85,20 @@ ds4_command_send_e ds4SetLightbar(uint8_t R, uint8_t G, uint8_t B)
     callback_registration.context = (void *)(&commands[DS4_COMMAND_LIGHTBAR]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCESS;
+    return true;
 }
 
-ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
+bool ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
 {
     ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
 
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
-        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+        return false;
 
     // The callback sets the command status to AVAILABLE when it is done sending
     if (commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
-        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
+        return false;
 
     commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
     commands[DS4_COMMAND_RUMBLE].device = ds4;
@@ -111,20 +111,20 @@ ds4_command_send_e ds4PlayRumble(uint8_t magnitude, uint16_t duration, uint16_t 
     callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCESS;
+    return true;
 }
 
-ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
+bool ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
 {
     ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
 
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
-        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+        return false;
 
     // The callback sets the command status to AVAILABLE when it is done sending
     if (commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
-        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
+        return false;
 
     commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
     commands[DS4_COMMAND_RUMBLE].device = ds4;
@@ -137,20 +137,20 @@ ds4_command_send_e ds4PlayRumbleWeak(uint8_t magnitude, uint16_t duration, uint1
     callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCESS;
+    return true;
 }
 
-ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
+bool ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uint16_t start_delay)
 {
     ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
 
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
-        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+        return false;
 
     // The callback sets the command status to AVAILABLE when it is done sending
     if (commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
-        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
+        return false;
 
     commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
     commands[DS4_COMMAND_RUMBLE].device = ds4;
@@ -163,20 +163,20 @@ ds4_command_send_e ds4PlayRumbleStrong(uint8_t magnitude, uint16_t duration, uin
     callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCESS;
+    return true;
 }
 
-ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay)
+bool ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uint16_t duration, uint16_t start_delay)
 {
     ds4_device_handle ds4 = uni_hid_device_get_instance_for_idx(DS4_DEVICE_IDX);
 
     // Controller not connected or no device handle
     if ((ds4GetConnectionStatus() != DS4_READY) || (ds4 == NULL))
-        return DS4_COMMAND_SEND_FAIL_NO_CONTROLLER;
+        return false;
 
     // The callback sets the command status to AVAILABLE when it is done sending
     if (commands[DS4_COMMAND_RUMBLE].status == DS4_COMMAND_STATUS_UNAVAILABLE)
-        return DS4_COMMAND_SEND_FAIL_LAST_COMMAND_NOT_SENT;
+        return false;
 
     commands[DS4_COMMAND_RUMBLE].status = DS4_COMMAND_STATUS_UNAVAILABLE; // Take the command spot
     commands[DS4_COMMAND_RUMBLE].device = ds4;
@@ -189,7 +189,7 @@ ds4_command_send_e ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitu
     callback_registration.context = (void *)(&commands[DS4_COMMAND_RUMBLE]);
     btstack_run_loop_execute_on_main_thread(&callback_registration);
 
-    return DS4_COMMAND_SEND_SUCCESS;
+    return true;
 }
 
 void ds4GetUserAddress(char buffer[18])
