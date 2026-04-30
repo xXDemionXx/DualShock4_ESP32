@@ -78,14 +78,14 @@ static void count_up(void *argv)
 {
     int *cnt = (int *)argv;
     (*cnt)++;
-    ESP_LOGI("count_up", "SQUARE button pressed");
+    ESP_LOGI("count_up", "DPAD UP button pressed");
 }
 
 static void count_down(void *argv)
 {
     int *cnt = (int *)argv;
     (*cnt)--;
-    ESP_LOGI("count_down", "TRIANGLE button pressed");
+    ESP_LOGI("count_down", "DPAD DOWN button pressed");
 }
 
 void set_lightbar(void *argv)

@@ -165,20 +165,23 @@ void event_checker(btn_t *btn)
 {
     btn_event_bits_t found_event_MASK;
     uint8_t found_event = DS4_BTN_EVENT_NO_EVENT;
+    uint8_t current_state = btn->states.current_state;
+    uint8_t prev_state = btn->states.prev_state;
     for (uint8_t i = 0; i < DS4_NUM_OF_BTN_EVENTS; i++)
     {
         found_event_MASK = DS4_BTN_EVENT_MASK_FROM_EVENT(i) & btn->event_settings.set_events;
         switch (found_event_MASK)
         {
         case (DS4_BTN_PRESS_MASK):
-            found_event = event_check_btn_press(btn->states.current_state, btn->states.prev_state);
+            found_event = event_check_btn_press(current_state, prev_state);
             break;
         case (DS4_BTN_RELEASE_MASK):
-            found_event = event_check_btn_release(btn->states.current_state, btn->states.prev_state);
+            found_event = event_check_btn_release(current_state, prev_state);
             break;
+        case (DS4_BTN_NO_EVENT_MASK):
         default:
-            // Do nothing if that event isn't set for monitoring
-            break;
+            // Continue to the next iteration if that event isn't being monitored
+            continue;
         }
         if (found_event != DS4_BTN_EVENT_NO_EVENT)
             trigger_event_function(found_event, &btn->event_settings);
