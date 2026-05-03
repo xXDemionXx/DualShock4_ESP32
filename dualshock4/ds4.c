@@ -40,8 +40,10 @@ static ds4_command_t commands[DS4_NUM_OF_COMMAND_TYPES] = {0}; // An array that 
 // Private function prototypes
 
 static void ds4_init_task(void *p_parameter);
-static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC);
 static bool ds4_bluepad32_init(void);
+#if defined(CONFIG_DS4_CONNECT_TO_SPECIFIC_MAC) || defined(CONFIG_DS4_BT_MAC_CUSTOM)
+static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC);
+#endif
 
 // Public functions
 
@@ -227,6 +229,7 @@ static void ds4_init_task(void *p_parameter)
     btstack_run_loop_execute(); // Does not return
 }
 
+#if defined(CONFIG_DS4_CONNECT_TO_SPECIFIC_MAC) || defined(CONFIG_DS4_BT_MAC_CUSTOM)
 // MAC is the return array
 // Returns false if formating error
 static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC)
@@ -282,6 +285,7 @@ static bool string_to_MAC(const char *MAC_string, bd_addr_t *MAC)
 
     return true;
 }
+#endif
 
 // Returns true if successful
 static bool ds4_bluepad32_init(void)
