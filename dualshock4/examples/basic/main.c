@@ -1,7 +1,6 @@
 // This example shows how to setup the basic polling aproach.
 //
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "esp_log.h"
 
 #include "ds4.h" // API header
