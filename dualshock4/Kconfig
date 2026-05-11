@@ -3,13 +3,9 @@ menu "DualShock4 Configuration"
     config DS4_ENABLE
         bool "Enable DS4"
         select BT_ENABLED
-        select BT_BLUEDROID_ENABLED
         select BLUEDROID_PINNED_TO_CORE_0
         select BT_BREDR_ENABLED
         select BT_CLASSIC_ENABLED
-        select BT_CONTROLLER_ENABLED
-        select BLUEPAD32_PLATFORM_CUSTOM
-
 
     choice DS4_MODE
         prompt "DualShock4 operation mode"
@@ -18,13 +14,13 @@ menu "DualShock4 Configuration"
         help
             Will you only be using polling or
             do you want to also attach events to buttons
-    
+
     config DS4_MODE_EVENT
         bool "Event-based mode"
 
     config DS4_MODE_ONLY_POLLING
         bool "Just polling"
-        
+
     endchoice
 
 
@@ -41,6 +37,7 @@ menu "DualShock4 Configuration"
 
     endchoice
 
+
     config DS4_BT_CUSTOM_MAC_STRING
         string "Custom Bluetooth MAC Address"
         depends on DS4_BT_MAC_CUSTOM
@@ -48,8 +45,8 @@ menu "DualShock4 Configuration"
         help
             Enter MAC in format:
             XX:XX:XX:XX:XX:XX
-    
-    
+
+
     choice DS4_CONTROLLER_CONNECT_MODE
         prompt "Controller connect mode"
         depends on DS4_ENABLE
@@ -63,6 +60,7 @@ menu "DualShock4 Configuration"
 
     endchoice
 
+
     config DS4_CONTROLLER_MAC_STRING
         string "MAC address of your controller"
         depends on DS4_CONNECT_TO_SPECIFIC_MAC
@@ -70,6 +68,5 @@ menu "DualShock4 Configuration"
         help
             Enter MAC in format:
             XX:XX:XX:XX:XX:XX
-    
 
 endmenu

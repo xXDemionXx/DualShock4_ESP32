@@ -1,6 +1,6 @@
-set(srcs "main.c")
-set(requires "dualshock4")
+cmake_minimum_required(VERSION 3.13)
 
-idf_component_register(SRCS "${srcs}"
-                    INCLUDE_DIRS "."
-                    REQUIRES "${requires}")
+set(EXTRA_COMPONENT_DIRS    ../../../)
+
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(ds4_basic_example)
