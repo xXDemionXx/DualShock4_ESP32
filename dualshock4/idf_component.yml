@@ -1,0 +1,10 @@
+dependencies:
+  idf: ">=5.3,<5.4"
+
+  bluepad32:
+    git: https://github.com/ricardoquesada/bluepad32
+    path: src/components/bluepad32
+    version: "4.2.0"
+  
+  # btstack:
+  #   version: "1.6.2"
