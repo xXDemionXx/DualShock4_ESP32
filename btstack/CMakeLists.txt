@@ -43,7 +43,6 @@ set(src_dirs
     "platform/lwip"
     "${IDF_PATH}/components/lwip/lwip/src/apps/http"
     ".")
-    #/home/demion/esp_projects/dualshock4_example/components/btstack/btstack_port_esp32.c
 
 if(${CONFIG_BTSTACK_AUDIO})
     if("${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}" VERSION_GREATER_EQUAL "5.0")
