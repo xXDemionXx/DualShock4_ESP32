@@ -6,5 +6,13 @@ dependencies:
     path: src/components/bluepad32
     version: "4.2.0"
   
-  # btstack:
-  #   version: "1.6.2"
+  cmd_nvs:
+    git: https://github.com/ricardoquesada/bluepad32
+    path: src/components/cmd_nvs
+    version: "4.2.0"
+
+  cmd_system:
+    git: https://github.com/ricardoquesada/bluepad32
+    path: src/components/cmd_system
+    version: "4.2.0"
+  

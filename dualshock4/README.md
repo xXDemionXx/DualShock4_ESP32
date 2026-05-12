@@ -1,9 +1,9 @@
-# DualShock4 library
+# DualShock4_ESP32 library
 
 A lightweight DualShock4 interface library for ESP32 focused on minimal setup and thread-safe polling/event APIs.
 
-![ESP-IDF](https://img.shields.io/badge/ESP--IDF-v5.3-green)
 ![Platform](https://img.shields.io/badge/platform-ESP32-orange)
+![ESP-IDF](https://img.shields.io/badge/ESP--IDF-v5.3-green)
 
 **Features:**
 
@@ -20,8 +20,7 @@ A lightweight DualShock4 interface library for ESP32 focused on minimal setup an
 ## Compatibility
 
 - Works only with the original ESP32!
-- ESP-IDF v5.3.4
-- Bluepad32 custom target
+- ESP-IDF v5.3.4 (higher versions might/might not work)
 - DualShock4 v1/v2
 
 ## Installation

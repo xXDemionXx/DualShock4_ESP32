@@ -22,6 +22,12 @@ if(CONFIG_DS4_MODE_EVENT)
     list(APPEND priv_includes   "receive/event_driven")
 endif()
 
+# set(EXTRA_COMPONENT_DIRS
+#     ${CMAKE_CURRENT_LIST_DIR}/third_party
+# )
+
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/btstack)
+
 idf_component_register(SRCS ${srcs}
                        INCLUDE_DIRS ${includes}
                        PRIV_INCLUDE_DIRS ${priv_includes}
