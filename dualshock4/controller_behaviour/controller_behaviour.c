@@ -227,15 +227,15 @@ static void default_ds4_platform_on_oob_event(uni_platform_oob_event_t event, vo
     switch (event)
     {
     case UNI_PLATFORM_OOB_GAMEPAD_SYSTEM_BUTTON:
-        logi(DUALSHOCK4_DEFAULT_NAME ": PS button");
+        // logi(DUALSHOCK4_DEFAULT_NAME ": PS button");
         break;
 
     case UNI_PLATFORM_OOB_BLUETOOTH_ENABLED:
-        logi(DUALSHOCK4_DEFAULT_NAME ": Bluetooth enabled: %d\n", (bool)(data));
+        // logi(DUALSHOCK4_DEFAULT_NAME ": Bluetooth enabled: %d\n", (bool)(data));
         break;
 
     default:
-        logi(DUALSHOCK4_DEFAULT_NAME ": unsupported event: 0x%04x\n", event);
+        // logi(DUALSHOCK4_DEFAULT_NAME ": unsupported event: 0x%04x\n", event);
         break;
     }
 }

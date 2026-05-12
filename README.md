@@ -25,24 +25,32 @@ A lightweight DualShock4 interface library for ESP32 focused on minimal setup an
 
 ## Installation
 
-Clone into your ESP-IDF components folder:
+Just clone into your ESP-IDF projects `components/` folder and extract the two component from the repo.  
+If you are in the root of your project you can just use this script:
 
 ```bash
 cd components
-git clone https://github.com/DualShock4.git
+git clone https://github.com/xXDemionXx/DualShock4_ESP32 tmp_repo
+mv tmp_repo/dualshock4 .
+mv tmp_repo/btstack .
+rm -rf tmp_repo
 ```
+
+>[!NOTE]  
+> When cloned, this library comes bundled with a btstack component which is a port needed for Bluepad32 component and the library itself.
 
 ## Quick Start
 
-1. Enable DS4 support in sdkconfig
-2. Configure Bluepad32 settings in sdkconfig:
+1. Install the library (the section above this one)
+2. Enable DS4 support in sdkconfig
+3. Configure Bluepad32 settings in sdkconfig:
     - Target platform -> Custom
     - Enable GAP security -> OFF
-3. Call `ds4Init()` in `app_main()`
-4. Flash to ESP32
-5. Read the Btstack MAC in the logs
-6. Set the MAC address on the controller to be the same as your ESP's Bluetooth
-7. Turn on the controller with the PS button
+4. Call `ds4Init()` in `app_main()`
+5. Flash to ESP32
+6. Read the Btstack MAC in the logs
+7. Set the MAC address on the controller to be the same as your ESP's Bluetooth
+8. Turn on the controller with the PS button
 
 ## Configuration
 
@@ -99,13 +107,13 @@ The event mode allows gives the user access to the `ds4SetButtonEvent()` functio
 
 The API functions of this library are thread safe, and you can call them from anywhere. The only requirement is that before you call any API function, you must first initialize the library with `ds4Init()`. We recommend calling this function in `app_main()` at the start of your program.
 
-After that you can freely call any other `ds4` function. You can see how to use all of the features in the `examples/` folder. Here is the minimal implementation for polling:
+After that you can freely call any other `ds4` function. You can see how to use all of the features in the `dualshock4/examples/` folder. Here is the minimal implementation for polling:
 
 ```c
 #include "freertos/FreeRTOS.h"
 #include "ds4.h"
 
-s4_data_t data = {0};
+ds4_data_t data = {0};
 
 void app_main(void){
 
@@ -118,7 +126,7 @@ void app_main(void){
                 printf("Circle pressed\n");
             }
         }
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 ```
