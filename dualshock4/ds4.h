@@ -9,6 +9,10 @@
 #include "ds4_btn_events.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Callable functions
 
 /**
@@ -122,5 +126,9 @@ bool ds4PlayRumbleSpecific(uint8_t magnitude_weak, uint8_t magnitude_strong, uin
  *       or you want to make sure you changed it to the correct one.
  */
 void ds4GetUserAddress(char buffer[18]);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // DS4_H
