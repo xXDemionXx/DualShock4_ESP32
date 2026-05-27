@@ -49,8 +49,61 @@ rm -rf tmp_repo
 4. Call `ds4Init()` in `app_main()`
 5. Flash to ESP32
 6. Read the Btstack MAC in the logs
-7. Set the MAC address on the controller to be the same as your ESP's Bluetooth
+7. Set the MAC address on the controller to be the same as your ESP's Bluetooth ([see the controller tools in basic setup](#controller-tools))
 8. Turn on the controller with the PS button
+
+## How to use the library
+
+The API functions of this library are thread safe, and you can call them from anywhere. The only requirement is that before you call any API function, you must first initialize the library with `ds4Init()`. We recommend calling this function in `app_main()` at the start of your program.
+
+After that you can freely call any other `ds4` function. You can see how to use all of the features in the `dualshock4/examples/` folder. Here is a minimal example for the basic features:
+
+```c
+#include "freertos/FreeRTOS.h"
+#include "ds4.h"
+
+ds4_data_t data = {};   // Struct that will receive controller data
+
+void app_main(void)
+{
+
+    ds4Init(); // Initialize the library
+    ds4SetPollingStruct(&data);
+
+#ifdef CONFIG_DS4_MODE_EVENT    // Only if you have enabled events in  sdkconfig
+    void print_on_event(void *param);
+    // Add an event to the triangle button press
+    ds4SetButtonEvent(DS4_BTN_TRIANGLE, DS4_BTN_EVENT_PRESS, &print_on_event, "Triangle button pressed");
+#endif
+
+    while (1)
+    {
+        // Controller must be connected and ready
+        if (ds4GetConnectionStatus() == DS4_READY)
+        {
+            if (data.buttons.circle) // If pressed
+            {
+                printf("Circle pressed\n");
+                ds4SetLightbar(255, 0, 0);  // Change color
+                ds4PlayRumble(255, 100, 0); // Play Rumble
+            }
+            else
+            {
+                ds4SetLightbar(0, 255, 0);  // Change color
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+#ifdef CONFIG_DS4_MODE_EVENT
+void print_on_event(void *param)
+{
+    printf("%s\n", (const char *)param);
+    ds4SetLightbar(100, 0, 100);
+}
+#endif
+```
 
 ## Configuration
 
@@ -66,14 +119,18 @@ Before you can use the API in your project, the library requires you to configur
 >     - Target platform -> custom
 >     - Maximum size of allowlist -> 1
 
-This setup will allow you to connect any *DualShock4* controller to your *ESP32* but you must change the stored MAC address on the controller to be the same as the default MAC address of the ESP's Bluetooth stack. You can see the MAC of the ESP if you have the console enabled in *Bluepad32* or you can use the `ds4GetUserAddress()` API function. To change the controller's stored MAC, there are several tools:
+This setup will allow you to connect any *DualShock4* controller to your *ESP32* but you must change the stored MAC address on the controller to be the same as the default MAC address of the ESP's Bluetooth stack. You can see the MAC of the ESP if you have the console enabled in *Bluepad32* or you can use the `ds4GetUserAddress()` API function. To change the controller's stored MAC, [see the heading bellow this one](#controller-tools).
+
+If you did everything correctly, you will be able to compile the basic example and flash it to your ESP. To connect, you only need to turn on the controller with the ***PS button*** and the controller should automatically connect after a few seconds.  
+*(if you have the Bluepad32 console turned on, you will be able to see the printout of how the connecting is happening)*
+
+### Controller tools
+
+To change the controller's stored connection MAC (or to just see what is the MAC of the controller), we recommend these tools:
 
 > - **Windows** -> [SixAxisPairTool](https://sixaxispairtool.en.lo4d.com/windows)
 > - **Linux** -> You are on your own
 > - **MAC** -> You are on your own
-
-If you did everything correctly, you will be able to compile the basic example and flash it to your ESP. To connect, you only need to turn on the controller with the ***PS button*** and the controller should automatically connect after a few seconds.  
-*(if you have the Bluepad32 console turned on, you will be able to see the printout of how the connecting is happening)*
 
 ---
 
@@ -102,34 +159,6 @@ Before you connect for the first time, you will have to put the *DualShock4* con
 ### Event mode
 
 The event mode allows gives the user access to the `ds4SetButtonEvent()` function. This function allows the user to register functions to be done on a button event in a separate task that handles button events. But if you plan on just using polling and not using this function, then you can choose ***DualShock4 operation mode -> Just polling,*** and you will not have an extra memory overhead of an extra task.
-
-## How to use the library
-
-The API functions of this library are thread safe, and you can call them from anywhere. The only requirement is that before you call any API function, you must first initialize the library with `ds4Init()`. We recommend calling this function in `app_main()` at the start of your program.
-
-After that you can freely call any other `ds4` function. You can see how to use all of the features in the `dualshock4/examples/` folder. Here is the minimal implementation for polling:
-
-```c
-#include "freertos/FreeRTOS.h"
-#include "ds4.h"
-
-ds4_data_t data = {0};
-
-void app_main(void){
-
-    ds4Init();
-    ds4SetPollingStruct(&data);
-
-    while(1){
-        if(ds4GetConnectionStatus() == DS4_READY){
-            if(data.buttons.circle){
-                printf("Circle pressed\n");
-            }
-        }
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-}
-```
 
 ## API Overview
 

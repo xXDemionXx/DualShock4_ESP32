@@ -1,4 +1,6 @@
 #include "ds4.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "controller_behaviour.h"
 #include "connection_status_modify.h"
 #include "controller_commands.h"
